@@ -1,0 +1,205 @@
+# ============================================================
+# Compose Multiplatform (Android + iOS) .gitignore
+# Windows Development Environment
+# ============================================================
+
+# ===== Gradle =====
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle cache
+.gradle-cache/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ===== Android =====
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+release/
+
+# Local configuration file (SDK path, etc)
+local.properties
+
+# Android Studio captures folder
+captures/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+
+# External native build folder
+.externalNativeBuild/
+.cxx/
+
+# NDK
+obj/
+
+# Android Profiler
+*.hprof
+
+# ===== IntelliJ IDEA / Android Studio =====
+.idea/*
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/runConfigurations/
+*.iml
+.idea/modules.xml
+.idea/gradle.xml
+.idea/libraries
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf
+.idea/compiler.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/deploymentTargetDropDown.xml
+.idea/vcs.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# ===== Kotlin =====
+.kotlin/
+kotlin-js-store/
+
+# ===== iOS / Xcode =====
+# Xcode user-specific files
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+
+# Xcode workspace
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/
+
+# CocoaPods
+Pods/
+*.podspec
+.symlinks/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# DerivedData
+DerivedData/
+
+# ===== macOS =====
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ===== Windows =====
+# Windows thumbnail cache
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# ===== IDE Logs & Temp Files =====
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===== Testing =====
+# Test coverage
+.coverage
+coverage/
+htmlcov/
+
+# ===== Miscellaneous =====
+# Backup files
+*.bak
+*.orig
+
+# Keystore files (NEVER commit these!)
+*.jks
+*.keystore
+keystore.properties
+
+# Google Services
+google-services.json
+GoogleService-Info.plist
+
+# Secrets
+secrets.properties
+api_keys.properties
+
+# Node modules (if using JS tooling)
+node_modules/
+
+# Firebase
+.firebase/
+
+# Environment files
+.env
+.env.local
+.env.*.local
