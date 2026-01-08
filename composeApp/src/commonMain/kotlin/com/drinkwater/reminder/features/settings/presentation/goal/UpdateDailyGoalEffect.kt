@@ -1,0 +1,4 @@
+package com.drinkwater.reminder.features.settings.presentation.goal
+
+class UpdateDailyGoalEffect {
+}
