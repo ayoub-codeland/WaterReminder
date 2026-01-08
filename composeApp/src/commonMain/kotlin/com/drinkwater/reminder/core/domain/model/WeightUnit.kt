@@ -1,11 +1,14 @@
 package com.drinkwater.reminder.core.domain.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Weight unit for measurements
  * 
  * Domain model - represents core business concept
  * Used for converting between metric and imperial systems
  */
+@Serializable
 enum class WeightUnit {
     KG,
     LBS;

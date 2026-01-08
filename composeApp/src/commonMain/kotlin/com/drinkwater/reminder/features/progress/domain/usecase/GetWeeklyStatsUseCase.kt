@@ -7,6 +7,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -22,6 +23,7 @@ class GetWeeklyStatsUseCase(
     
     private fun getCurrentWeekRange(): Pair<String, String> {
         val now = Clock.System.now()
+
         val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
         
         // Find Monday of current week
@@ -32,13 +34,13 @@ class GetWeeklyStatsUseCase(
         return formatDate(monday) to formatDate(sunday)
     }
     
-    private fun LocalDate.plus(days: Int, unit: DateTimeUnit.DAY): LocalDate {
+    private fun LocalDate.plus(days: Int, unit: DateTimeUnit.DayBased): LocalDate {
         return LocalDate.fromEpochDays(this.toEpochDays() + days)
     }
     
     private fun formatDate(date: LocalDate): String {
         val year = date.year
-        val month = date.monthNumber.toString().padStart(2, '0')
+        val month = date.month.number.toString().padStart(2, '0')
         val day = date.dayOfMonth.toString().padStart(2, '0')
         return "$year-$month-$day"
     }

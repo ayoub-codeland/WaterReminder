@@ -1,74 +1,91 @@
 package com.drinkwater.reminder.features.settings.presentation.weight
 
+import androidx.lifecycle.viewModelScope
+import com.drinkwater.reminder.core.domain.model.WeightUnit
+import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
-import com.drinkwater.reminder.features.onboarding.presentation.profile.WeightUnit
+import com.drinkwater.reminder.features.settings.domain.usecase.UpdateWeightUseCase
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
-/**
- * ViewModel for Update Weight Screen
- * 
- * Handles weight input, unit conversion, and slider synchronization
- */
 class UpdateWeightViewModel(
-    initialWeight: Float = 75.5f,
-    initialUnit: WeightUnit = WeightUnit.KG
-) : BaseViewModel<UpdateWeightUiState, UpdateWeightUiEvent, UpdateWeightUiEffect>(
-    initialState = UpdateWeightUiState(
-        weight = initialWeight,
-        weightUnit = initialUnit
-    )
+    private val getUserProfile: GetUserProfileUseCase,
+    private val updateWeight: UpdateWeightUseCase
+) : BaseViewModel<UpdateWeightState, UpdateWeightEvent, UpdateWeightEffect>(
+    initialState = UpdateWeightState(isLoading = true)
 ) {
 
-    override fun onEvent(event: UpdateWeightUiEvent) {
+    private var isSavingInProgress = false
+
+    init {
+        loadCurrentWeight()
+    }
+
+    override fun onEvent(event: UpdateWeightEvent) {
         when (event) {
-            is UpdateWeightUiEvent.OnWeightChanged -> {
+            is UpdateWeightEvent.OnWeightChanged -> {
                 handleWeightChange(event.weight)
             }
-            
-            is UpdateWeightUiEvent.OnWeightUnitChanged -> {
+            is UpdateWeightEvent.OnWeightUnitChanged -> {
                 handleUnitChange(event.unit)
             }
-            
-            is UpdateWeightUiEvent.OnIncrementWeight -> {
+            is UpdateWeightEvent.OnIncrementWeight -> {
                 incrementWeight()
             }
-            
-            is UpdateWeightUiEvent.OnDecrementWeight -> {
+            is UpdateWeightEvent.OnDecrementWeight -> {
                 decrementWeight()
             }
-            
-            is UpdateWeightUiEvent.OnSaveClick -> {
+            is UpdateWeightEvent.OnSaveClick -> {
                 saveWeight()
             }
-            
-            is UpdateWeightUiEvent.OnBackClick -> {
-                sendEffect(UpdateWeightUiEffect.NavigateBack)
+            is UpdateWeightEvent.OnBackClick -> {
+                sendEffect(UpdateWeightEffect.NavigateBack)
+            }
+        }
+    }
+
+    private fun loadCurrentWeight() {
+        viewModelScope.launch {
+            try {
+                val profile = getUserProfile()
+                updateState {
+                    copy(
+                        weight = profile?.weight ?: 75f,
+                        weightUnit = profile?.weightUnit ?: WeightUnit.KG,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                updateState { copy(isLoading = false) }
+                sendEffect(UpdateWeightEffect.ShowError("Failed to load data"))
             }
         }
     }
 
     private fun handleWeightChange(weight: Float) {
-        val clampedWeight = weight.coerceIn(currentState.minWeight, currentState.maxWeight)
-        updateState {
-            copy(weight = clampedWeight)
-        }
+        val roundedWeight = (weight * 10).roundToInt() / 10f
+        val clampedWeight = roundedWeight.coerceIn(currentState.minWeight, currentState.maxWeight)
+        updateState { copy(weight = clampedWeight) }
     }
 
     private fun handleUnitChange(unit: WeightUnit) {
         if (unit == currentState.weightUnit) return
-        
+
         val convertedWeight = when (unit) {
-            WeightUnit.KG -> currentState.weight / 2.20462f // lbs to kg
-            WeightUnit.LBS -> currentState.weight * 2.20462f // kg to lbs
+            WeightUnit.KG -> currentState.weightUnit.toKg(currentState.weight)
+            WeightUnit.LBS -> currentState.weightUnit.toLbs(currentState.weight)
         }
-        
+
+        val roundedWeight = (convertedWeight * 10).roundToInt() / 10f
+
         val (newMin, newMax) = when (unit) {
             WeightUnit.KG -> 30f to 150f
             WeightUnit.LBS -> 66f to 330f
         }
-        
+
         updateState {
             copy(
-                weight = convertedWeight,
+                weight = roundedWeight,
                 weightUnit = unit,
                 minWeight = newMin,
                 maxWeight = newMax
@@ -77,30 +94,35 @@ class UpdateWeightViewModel(
     }
 
     private fun incrementWeight() {
-        val increment = if (currentState.weightUnit == WeightUnit.KG) 0.5f else 1f
+        val increment = 0.1f
         val newWeight = (currentState.weight + increment).coerceAtMost(currentState.maxWeight)
-        updateState {
-            copy(weight = newWeight)
-        }
+        val roundedWeight = (newWeight * 10).roundToInt() / 10f
+        updateState { copy(weight = roundedWeight) }
     }
 
     private fun decrementWeight() {
-        val decrement = if (currentState.weightUnit == WeightUnit.KG) 0.5f else 1f
+        val decrement = 0.1f
         val newWeight = (currentState.weight - decrement).coerceAtLeast(currentState.minWeight)
-        updateState {
-            copy(weight = newWeight)
-        }
+        val roundedWeight = (newWeight * 10).roundToInt() / 10f
+        updateState { copy(weight = roundedWeight) }
     }
 
     private fun saveWeight() {
-        updateState { copy(isSaving = true) }
+        if (isSavingInProgress) return
+        isSavingInProgress = true
         
+        updateState { copy(isSaving = true) }
+
         viewModelScope.launch {
-            // TODO: Save weight to repository
-            kotlinx.coroutines.delay(500) // Simulate save
-            
-            updateState { copy(isSaving = false) }
-            sendEffect(UpdateWeightUiEffect.NavigateBack)
+            try {
+                updateWeight(currentState.weight, currentState.weightUnit)
+                updateState { copy(isSaving = false) }
+                sendEffect(UpdateWeightEffect.NavigateBack)
+            } catch (e: Exception) {
+                updateState { copy(isSaving = false) }
+                isSavingInProgress = false
+                sendEffect(UpdateWeightEffect.ShowError(e.message ?: "Failed to save"))
+            }
         }
     }
 }

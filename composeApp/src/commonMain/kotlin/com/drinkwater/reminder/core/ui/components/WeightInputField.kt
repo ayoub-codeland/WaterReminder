@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,18 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.drinkwater.reminder.core.theme.*
 
 /**
  * Weight input field
  *
- * Uses theme colors from Color.kt (matches HTML design)
+ * Uses theme typography and colors (NO hardcoded styles)
+ *
+ * HTML reference:
+ * - Input: text-2xl font-bold = displaySmall
+ * - Hint: text-xs font-bold uppercase tracking-wide = labelMedium
  */
 @Composable
 fun WeightInputField(
@@ -39,7 +40,6 @@ fun WeightInputField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Track focus state
     var isFocused by remember { mutableStateOf(false) }
 
     Box(
@@ -49,15 +49,17 @@ fun WeightInputField(
             .border(
                 border = BorderStroke(
                     width = 1.dp,
-                    color = if (isFocused) Primary else SubtleBorder
+                    color = if (isFocused)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.outlineVariant
                 ),
                 shape = RoundedCornerShape(16.dp)
             )
-            .background(SurfaceLight)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        // BasicTextField (center-aligned text)
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -66,17 +68,15 @@ fun WeightInputField(
                 .onFocusChanged { focusState ->
                     isFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Slate900,
-                textAlign = TextAlign.Center
+            textStyle = MaterialTheme.typography.displaySmall.copy(
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
             singleLine = true,
-            cursorBrush = SolidColor(Primary)
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
         )
 
         // Hint text on right side (only visible when empty)
@@ -84,16 +84,14 @@ fun WeightInputField(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.CenterEnd)
+                    .align(Alignment.Center)
                     .padding(end = 4.dp),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "ENTER VALUE",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate400.copy(alpha = 0.5f),
-                    letterSpacing = 0.5.sp
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }

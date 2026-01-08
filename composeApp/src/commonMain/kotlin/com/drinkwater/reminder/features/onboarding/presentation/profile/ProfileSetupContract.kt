@@ -1,38 +1,13 @@
-package com.drinkwater.reminder.features.onboarding.profile
+package com.drinkwater.reminder.features.onboarding.presentation.profile
 
+import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.AgeGroup
+import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.presentation.UiEffect
 import com.drinkwater.reminder.core.presentation.UiEvent
 import com.drinkwater.reminder.core.presentation.UiState
 import com.drinkwater.reminder.core.ui.components.BiologicalSex
 
-/**
- * Age group options
- */
-enum class AgeGroup {
-    AGE_18_30,
-    AGE_31_50,
-    AGE_51_60,
-    AGE_60_PLUS
-}
-
-/**
- * Activity level options
- */
-enum class ActivityLevel {
-    SEDENTARY,      // 1
-    LIGHT,          // 2
-    MODERATE,       // 3
-    ACTIVE,         // 4
-    VERY_ACTIVE     // 5
-}
-
-/**
- * Weight unit
- */
-enum class WeightUnit {
-    KG,
-    LBS
-}
 
 /**
  * UI State for Profile Setup Screen

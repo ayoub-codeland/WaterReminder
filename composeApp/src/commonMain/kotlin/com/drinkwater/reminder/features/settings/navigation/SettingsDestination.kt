@@ -7,6 +7,10 @@ sealed interface SettingsDestination : NavigationDestination {
         override val route = "settings"
     }
     
+    data object EditProfile : SettingsDestination {
+        override val route = "settings/edit_profile"
+    }
+    
     data object UpdateWeight : SettingsDestination {
         override val route = "settings/update_weight"
     }

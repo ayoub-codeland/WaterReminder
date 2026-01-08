@@ -1,4 +1,4 @@
-package com.drinkwater.reminder.features.onboarding.welcome
+package com.drinkwater.reminder.features.onboarding.presentation.welcome
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

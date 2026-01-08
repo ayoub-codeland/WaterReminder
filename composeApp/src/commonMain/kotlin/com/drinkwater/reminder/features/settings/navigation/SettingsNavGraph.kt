@@ -1,19 +1,31 @@
 package com.drinkwater.reminder.features.settings.navigation
 
-import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.drinkwater.reminder.core.navigation.HandleEffects
 import com.drinkwater.reminder.features.settings.presentation.activity.UpdateActivityLevelEffect
 import com.drinkwater.reminder.features.settings.presentation.activity.UpdateActivityLevelScreen
+import com.drinkwater.reminder.features.settings.presentation.activity.UpdateActivityLevelViewModel
 import com.drinkwater.reminder.features.settings.presentation.goal.UpdateDailyGoalEffect
 import com.drinkwater.reminder.features.settings.presentation.goal.UpdateDailyGoalScreen
+import com.drinkwater.reminder.features.settings.presentation.goal.UpdateDailyGoalViewModel
 import com.drinkwater.reminder.features.settings.presentation.main.SettingsEffect
 import com.drinkwater.reminder.features.settings.presentation.main.SettingsScreen
+import com.drinkwater.reminder.features.settings.presentation.main.SettingsViewModel
+import com.drinkwater.reminder.features.settings.presentation.profile.EditProfileEffect
+import com.drinkwater.reminder.features.settings.presentation.profile.EditProfileScreen
+import com.drinkwater.reminder.features.settings.presentation.profile.EditProfileViewModel
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightEffect
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightScreen
+import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * Settings module navigation graph
+ * Uses Koin for ViewModel injection
+ */
 fun NavGraphBuilder.settingsGraph(
     navController: NavHostController,
     route: String = "settings_graph"
@@ -23,21 +35,21 @@ fun NavGraphBuilder.settingsGraph(
         route = route
     ) {
         val navigator = SettingsNavigator(navController)
-        val viewModelFactory = SettingsViewModelFactory()
         
-        settingsMainScreen(navigator, viewModelFactory)
-        updateWeightScreen(navigator, viewModelFactory)
-        updateActivityScreen(navigator, viewModelFactory)
-        updateGoalScreen(navigator, viewModelFactory)
+        settingsMainScreen(navigator)
+        editProfileScreen(navigator)
+        updateWeightScreen(navigator)
+        updateActivityScreen(navigator)
+        updateGoalScreen(navigator)
     }
 }
 
 private fun NavGraphBuilder.settingsMainScreen(
-    navigator: SettingsNavigator,
-    viewModelFactory: SettingsViewModelFactory
+    navigator: SettingsNavigator
 ) {
     composable(SettingsDestination.Main.route) {
-        val viewModel = remember { viewModelFactory.createSettingsViewModel() }
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<SettingsViewModel>()
         
         SettingsScreen(
             viewModel = viewModel,
@@ -47,10 +59,10 @@ private fun NavGraphBuilder.settingsMainScreen(
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 SettingsEffect.NavigateBack -> navigator.navigateBack()
+                SettingsEffect.NavigateToEditProfile -> navigator.navigateToEditProfile()
                 SettingsEffect.NavigateToWeightSettings -> navigator.navigateToUpdateWeight()
                 SettingsEffect.NavigateToActivitySettings -> navigator.navigateToUpdateActivity()
                 SettingsEffect.NavigateToGoalSettings -> navigator.navigateToUpdateGoal()
-                SettingsEffect.NavigateToEditProfile -> {}
                 SettingsEffect.NavigateToNotifications -> {}
                 SettingsEffect.NavigateToStartOfWeek -> {}
                 is SettingsEffect.OpenUrl -> navigator.openUrl(effect.url)
@@ -59,16 +71,36 @@ private fun NavGraphBuilder.settingsMainScreen(
     }
 }
 
+private fun NavGraphBuilder.editProfileScreen(
+    navigator: SettingsNavigator
+) {
+    composable(SettingsDestination.EditProfile.route) {
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<EditProfileViewModel>()
+        
+        EditProfileScreen(
+            viewModel = viewModel,
+        )
+        
+        HandleEffects(viewModel.effect) { effect ->
+            when (effect) {
+                EditProfileEffect.NavigateBack -> navigator.navigateBack()
+                is EditProfileEffect.ShowError -> {}
+                EditProfileEffect.OpenImagePicker -> {}
+            }
+        }
+    }
+}
+
 private fun NavGraphBuilder.updateWeightScreen(
-    navigator: SettingsNavigator,
-    viewModelFactory: SettingsViewModelFactory
+    navigator: SettingsNavigator
 ) {
     composable(SettingsDestination.UpdateWeight.route) {
-        val viewModel = remember { viewModelFactory.createUpdateWeightViewModel() }
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<UpdateWeightViewModel>()
         
         UpdateWeightScreen(
             viewModel = viewModel,
-            onNavigateBack = navigator::navigateBack
         )
         
         HandleEffects(viewModel.effect) { effect ->
@@ -81,15 +113,14 @@ private fun NavGraphBuilder.updateWeightScreen(
 }
 
 private fun NavGraphBuilder.updateActivityScreen(
-    navigator: SettingsNavigator,
-    viewModelFactory: SettingsViewModelFactory
+    navigator: SettingsNavigator
 ) {
     composable(SettingsDestination.UpdateActivity.route) {
-        val viewModel = remember { viewModelFactory.createUpdateActivityViewModel() }
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<UpdateActivityLevelViewModel>()
         
         UpdateActivityLevelScreen(
             viewModel = viewModel,
-            onNavigateBack = navigator::navigateBack
         )
         
         HandleEffects(viewModel.effect) { effect ->
@@ -102,15 +133,14 @@ private fun NavGraphBuilder.updateActivityScreen(
 }
 
 private fun NavGraphBuilder.updateGoalScreen(
-    navigator: SettingsNavigator,
-    viewModelFactory: SettingsViewModelFactory
+    navigator: SettingsNavigator
 ) {
     composable(SettingsDestination.UpdateGoal.route) {
-        val viewModel = remember { viewModelFactory.createUpdateGoalViewModel() }
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<UpdateDailyGoalViewModel>()
         
         UpdateDailyGoalScreen(
             viewModel = viewModel,
-            onNavigateBack = navigator::navigateBack
         )
         
         HandleEffects(viewModel.effect) { effect ->

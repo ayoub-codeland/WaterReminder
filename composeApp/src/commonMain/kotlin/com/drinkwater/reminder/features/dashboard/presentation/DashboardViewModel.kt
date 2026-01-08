@@ -1,4 +1,4 @@
-package com.drinkwater.reminder.features.dashboard
+package com.drinkwater.reminder.features.dashboard.presentation
 
 import com.drinkwater.reminder.core.presentation.BaseViewModel
 

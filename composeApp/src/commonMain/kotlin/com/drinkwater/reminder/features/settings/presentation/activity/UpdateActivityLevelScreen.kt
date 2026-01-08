@@ -28,9 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,22 +39,12 @@ import androidx.compose.ui.unit.dp
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
 import com.drinkwater.reminder.core.ui.components.ActivitySlider
 import com.drinkwater.reminder.core.ui.components.AppScaffold
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun UpdateActivityLevelScreen(
-    viewModel: UpdateActivityLevelViewModel,
-    onNavigateBack: () -> Unit
+    viewModel: UpdateActivityLevelViewModel
 ) {
     val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is UpdateActivityLevelUiEffect.NavigateBack -> onNavigateBack()
-            }
-        }
-    }
 
     UpdateActivityLevelScreenContent(
         state = state,
@@ -66,20 +54,20 @@ fun UpdateActivityLevelScreen(
 
 @Composable
 private fun UpdateActivityLevelScreenContent(
-    state: UpdateActivityLevelUiState,
-    onEvent: (UpdateActivityLevelUiEvent) -> Unit
+    state: UpdateActivityLevelState,
+    onEvent: (UpdateActivityLevelEvent) -> Unit
 ) {
     AppScaffold(
         topBar = {
             Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.fillMaxWidth().padding(16.dp)) {
                     IconButton(
-                        onClick = { onEvent(UpdateActivityLevelUiEvent.OnBackClick) },
+                        onClick = { onEvent(UpdateActivityLevelEvent.OnBackClick) },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
-                    
+
                     Text(
                         "Update Activity Level",
                         style = MaterialTheme.typography.titleMedium,
@@ -91,11 +79,14 @@ private fun UpdateActivityLevelScreenContent(
         }
     ) { _ ->
         Column(
-            Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(horizontal = 24.dp),
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.weight(0.5f))
-            
+
             Box(Modifier.padding(bottom = 32.dp), Alignment.Center) {
                 Box(
                     Modifier.size(144.dp).background(
@@ -103,7 +94,7 @@ private fun UpdateActivityLevelScreenContent(
                         CircleShape
                     )
                 )
-                
+
                 Surface(
                     Modifier.size(128.dp),
                     shape = CircleShape,
@@ -120,7 +111,7 @@ private fun UpdateActivityLevelScreenContent(
                         )
                     }
                 }
-                
+
                 Surface(
                     Modifier.align(Alignment.BottomCenter).offset(y = 12.dp),
                     shape = RoundedCornerShape(12.dp),
@@ -132,7 +123,12 @@ private fun UpdateActivityLevelScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.WaterDrop, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(14.dp))
+                        Icon(
+                            Icons.Default.WaterDrop,
+                            null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(14.dp)
+                        )
                         Text(
                             "+${state.additionalWater}ml",
                             style = MaterialTheme.typography.labelMedium,
@@ -142,7 +138,7 @@ private fun UpdateActivityLevelScreenContent(
                     }
                 }
             }
-            
+
             Text(
                 state.displayName,
                 style = MaterialTheme.typography.displaySmall,
@@ -150,24 +146,32 @@ private fun UpdateActivityLevelScreenContent(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            
+
             Text(
                 state.description,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 280.dp).padding(bottom = 32.dp)
             )
-            
+
             Column(Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
                 Row(
                     Modifier.fillMaxWidth().padding(horizontal = 4.dp).padding(bottom = 16.dp),
                     Arrangement.SpaceBetween
                 ) {
-                    Text("SEDENTARY", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("EXTREMELY", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        "SEDENTARY",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "EXTREMELY",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                
+
                 ActivitySlider(
                     value = state.sliderValue,
                     onValueChange = { value ->
@@ -178,13 +182,13 @@ private fun UpdateActivityLevelScreenContent(
                             4 -> ActivityLevel.ACTIVE
                             else -> ActivityLevel.VERY_ACTIVE
                         }
-                        onEvent(UpdateActivityLevelUiEvent.OnActivityLevelChanged(level))
+                        onEvent(UpdateActivityLevelEvent.OnActivityLevelChanged(level))
                     },
                     enabled = !state.isSaving,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            
+
             Surface(
                 Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -193,7 +197,12 @@ private fun UpdateActivityLevelScreenContent(
                 shadowElevation = 1.dp
             ) {
                 Row(Modifier.padding(16.dp), Arrangement.spacedBy(12.dp)) {
-                    Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                    Icon(
+                        Icons.Default.Info,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Text(
                         "Increasing your activity level will adjust your daily hydration goal. Based on \"${state.displayName}\", we recommend adding ${state.additionalWater}ml to your daily intake.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -201,28 +210,28 @@ private fun UpdateActivityLevelScreenContent(
                     )
                 }
             }
-            
+
             Spacer(Modifier.weight(1f))
-            
+
             Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
                 Button(
-                    onClick = { onEvent(UpdateActivityLevelUiEvent.OnSaveClick) },
+                    onClick = { onEvent(UpdateActivityLevelEvent.OnSaveClick) },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     enabled = !state.isSaving
                 ) {
                     if (state.isSaving) {
-                        CircularProgressIndicator(Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                        CircularProgressIndicator(
+                            Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     } else {
-                        Text("Save Changes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(
+                            "Save Changes",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                }
-                
-                TextButton(
-                    onClick = { onEvent(UpdateActivityLevelUiEvent.OnCancelClick) },
-                    modifier = Modifier.fillMaxWidth().height(40.dp)
-                ) {
-                    Text("Cancel", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }

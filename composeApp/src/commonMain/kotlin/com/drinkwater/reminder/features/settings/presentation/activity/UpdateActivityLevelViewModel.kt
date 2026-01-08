@@ -1,47 +1,75 @@
 package com.drinkwater.reminder.features.settings.presentation.activity
 
+import androidx.lifecycle.viewModelScope
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
+import com.drinkwater.reminder.features.settings.domain.usecase.UpdateActivityLevelUseCase
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel for Update Activity Level Screen
- */
 class UpdateActivityLevelViewModel(
-    initialLevel: ActivityLevel = ActivityLevel.MODERATE
-) : BaseViewModel<UpdateActivityLevelUiState, UpdateActivityLevelUiEvent, UpdateActivityLevelUiEffect>(
-    initialState = UpdateActivityLevelUiState(activityLevel = initialLevel)
+    private val getUserProfile: GetUserProfileUseCase,
+    private val updateActivityLevel: UpdateActivityLevelUseCase
+) : BaseViewModel<UpdateActivityLevelState, UpdateActivityLevelEvent, UpdateActivityLevelEffect>(
+    initialState = UpdateActivityLevelState(isLoading = true)
 ) {
 
-    override fun onEvent(event: UpdateActivityLevelUiEvent) {
+    private var isSavingInProgress = false
+
+    init {
+        loadCurrentActivityLevel()
+    }
+
+    override fun onEvent(event: UpdateActivityLevelEvent) {
         when (event) {
-            is UpdateActivityLevelUiEvent.OnActivityLevelChanged -> {
+            is UpdateActivityLevelEvent.OnActivityLevelChanged -> {
                 updateState { copy(activityLevel = event.level) }
             }
-            
-            is UpdateActivityLevelUiEvent.OnSaveClick -> {
+            is UpdateActivityLevelEvent.OnSaveClick -> {
                 saveActivityLevel()
             }
-            
-            is UpdateActivityLevelUiEvent.OnCancelClick -> {
-                sendEffect(UpdateActivityLevelUiEffect.NavigateBack)
+            is UpdateActivityLevelEvent.OnCancelClick -> {
+                sendEffect(UpdateActivityLevelEffect.NavigateBack)
             }
-            
-            is UpdateActivityLevelUiEvent.OnBackClick -> {
-                sendEffect(UpdateActivityLevelUiEffect.NavigateBack)
+            is UpdateActivityLevelEvent.OnBackClick -> {
+                sendEffect(UpdateActivityLevelEffect.NavigateBack)
+            }
+        }
+    }
+
+    private fun loadCurrentActivityLevel() {
+        viewModelScope.launch {
+            try {
+                val profile = getUserProfile()
+                updateState {
+                    copy(
+                        activityLevel = profile?.activityLevel ?: ActivityLevel.MODERATE,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                updateState { copy(isLoading = false) }
+                sendEffect(UpdateActivityLevelEffect.ShowError("Failed to load data"))
             }
         }
     }
 
     private fun saveActivityLevel() {
-        updateState { copy(isSaving = true) }
+        if (isSavingInProgress) return
+        isSavingInProgress = true
         
+        updateState { copy(isSaving = true) }
+
         viewModelScope.launch {
-            // TODO: Save activity level to repository
-            kotlinx.coroutines.delay(500)
-            
-            updateState { copy(isSaving = false) }
-            sendEffect(UpdateActivityLevelUiEffect.NavigateBack)
+            try {
+                updateActivityLevel(currentState.activityLevel)
+                updateState { copy(isSaving = false) }
+                sendEffect(UpdateActivityLevelEffect.NavigateBack)
+            } catch (e: Exception) {
+                updateState { copy(isSaving = false) }
+                isSavingInProgress = false
+                sendEffect(UpdateActivityLevelEffect.ShowError(e.message ?: "Failed to save"))
+            }
         }
     }
 }

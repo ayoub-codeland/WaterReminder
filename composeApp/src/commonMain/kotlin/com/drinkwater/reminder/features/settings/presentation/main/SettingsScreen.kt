@@ -1,4 +1,4 @@
-package com.drinkwater.reminder.features.settings
+package com.drinkwater.reminder.features.settings.presentation.main
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,10 +18,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.VolumeUnit
+import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.ui.components.AppScaffold
+import com.drinkwater.reminder.core.ui.components.StandardTopBarCentered
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingsScreen(
@@ -31,143 +32,76 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is SettingsUiEffect.NavigateToEditProfile -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.NavigateToWeightSettings -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.NavigateToActivitySettings -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.NavigateToGoalSettings -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.NavigateToNotifications -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.NavigateToStartOfWeek -> {
-                    // Handle navigation
-                }
-
-                is SettingsUiEffect.OpenUrl -> {
-                    // Handle opening URL
-                }
-            }
-        }
-    }
-
     AppScaffold(
         topBar = {
-            Column {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background,
-                    tonalElevation = 0.dp
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Settings",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.CenterEnd
-                        ) {
-                            TextButton(
-                                onClick = onNavigateBack
-                            ) {
-                                Text(
-                                    text = "Done",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-                }
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-            }
+            StandardTopBarCentered(
+                title = "Settings"
+            )
+        },
+        bottomBar = {
+            SettingsBottomNavigation(
+                onHomeClick = { viewModel.onEvent(SettingsEvent.OnBackClick) },
+                onProgressClick = { /* Navigate to Progress */ },
+                onSettingsClick = { /* Already on Settings */ }
+            )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.background)
-                .padding(bottom = 40.dp)
+                .padding(bottom = 24.dp)
         ) {
-            // Profile Card
             ProfileCard(
                 userName = state.userName,
                 dailyGoal = state.dailyGoal,
                 onEditClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnEditProfileClick)
+                    viewModel.onEvent(SettingsEvent.OnEditProfileClick)
                 }
             )
 
-            // Profile & Algorithm Section
             ProfileAlgorithmSection(
                 weight = state.weight,
                 weightUnit = state.weightUnit,
                 activityLevel = state.activityLevel,
                 dailyGoal = state.dailyGoal,
                 onWeightClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnWeightClick)
+                    viewModel.onEvent(SettingsEvent.OnWeightClick)
                 },
                 onActivityClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnActivityLevelClick)
+                    viewModel.onEvent(SettingsEvent.OnActivityLevelClick)
                 },
                 onDailyGoalClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnDailyGoalClick)
+                    viewModel.onEvent(SettingsEvent.OnDailyGoalClick)
                 }
             )
 
-            // Notifications Section
             NotificationsSection(
                 onNotificationClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnNotificationPreferencesClick)
+                    viewModel.onEvent(SettingsEvent.OnNotificationPreferencesClick)
                 }
             )
 
-            // App Preferences Section
             AppPreferencesSection(
                 volumeUnit = state.volumeUnit,
                 startOfWeek = state.startOfWeek,
                 onVolumeUnitChanged = { unit ->
-                    viewModel.onEvent(SettingsUiEvent.OnVolumeUnitChanged(unit))
+                    viewModel.onEvent(SettingsEvent.OnVolumeUnitChanged(unit))
                 },
                 onStartOfWeekClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnStartOfWeekClick)
+                    viewModel.onEvent(SettingsEvent.OnStartOfWeekClick)
                 }
             )
 
-            // About Section
             AboutSection(
                 appVersion = state.appVersion,
                 onPrivacyPolicyClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnPrivacyPolicyClick)
+                    viewModel.onEvent(SettingsEvent.OnPrivacyPolicyClick)
                 },
                 onTermsClick = {
-                    viewModel.onEvent(SettingsUiEvent.OnTermsOfServiceClick)
+                    viewModel.onEvent(SettingsEvent.OnTermsOfServiceClick)
                 }
             )
         }
@@ -311,7 +245,6 @@ private fun SettingsItem(
     }
 }
 
-// Placeholder composables (implement these based on your needs)
 @Composable
 private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Unit) {
     Box(
@@ -333,7 +266,6 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profile Image
                 Box(
                     modifier = Modifier
                         .size(64.dp)
@@ -364,7 +296,7 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Alex Johnson",
+                        text = userName,
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -380,7 +312,7 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = "Goal: 2500ml",
+                            text = "Goal: ${dailyGoal}ml",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -388,7 +320,7 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
                 }
 
                 IconButton(
-                    onClick = { },
+                    onClick = { onEditClick() },
                     modifier = Modifier.size(40.dp)
                 ) {
                     Box(
@@ -412,14 +344,19 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
 
 @Composable
 private fun ProfileAlgorithmSection(
-    weight: Int,
-    weightUnit: String,
-    activityLevel: String,
+    weight: Float,
+    weightUnit: WeightUnit,
+    activityLevel: ActivityLevel,
     dailyGoal: Int,
     onWeightClick: () -> Unit,
     onActivityClick: () -> Unit,
     onDailyGoalClick: () -> Unit
 ) {
+    val weightContent = "$weight " + when (weightUnit) {
+        WeightUnit.KG -> "kg"
+        WeightUnit.LBS -> "lbs"
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -443,37 +380,34 @@ private fun ProfileAlgorithmSection(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Weight
                 SettingsItem(
                     icon = Icons.Outlined.MonitorWeight,
                     iconBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     iconTint = MaterialTheme.colorScheme.primary,
                     title = "Weight",
-                    value = "75 kg",
+                    value = weightContent,
                     valueColor = MaterialTheme.colorScheme.primary,
                     showDivider = true,
                     onClick = { onWeightClick() }
                 )
 
-                // Activity Level
                 SettingsItem(
                     icon = Icons.Default.DirectionsRun,
                     iconBackgroundColor = Color(0xFFFFEDD5),
                     iconTint = Color(0xFFF97316),
                     title = "Activity Level",
-                    value = "Moderate",
+                    value = activityLevel.displayName,
                     valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     showDivider = true,
                     onClick = { onActivityClick() }
                 )
 
-                // Daily Goal
                 SettingsItem(
                     icon = Icons.Outlined.LocalDrink,
                     iconBackgroundColor = Color(0xFFCFFAFE),
                     iconTint = Color(0xFF06B6D4),
                     title = "Daily Goal",
-                    value = "Auto (2500ml)",
+                    value = "Auto ($dailyGoal ml)",
                     valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     showDivider = false,
                     onClick = { onDailyGoalClick() }
@@ -520,9 +454,7 @@ private fun NotificationsSection(onNotificationClick: () -> Unit) {
                 value = null,
                 valueColor = null,
                 showDivider = false,
-                onClick = {
-                    onNotificationClick
-                }
+                onClick = onNotificationClick
             )
         }
     }
@@ -558,19 +490,17 @@ private fun AppPreferencesSection(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Start of Week
                 SettingsItem(
                     icon = Icons.Outlined.CalendarMonth,
                     iconBackgroundColor = Color(0xFFFEE2E2),
                     iconTint = Color(0xFFEF4444),
                     title = "Start of Week",
-                    value = "Monday",
+                    value = startOfWeek,
                     valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     showDivider = true,
                     onClick = onStartOfWeekClick
                 )
 
-                // Units
                 SettingsItem(
                     icon = Icons.Default.Straighten,
                     iconBackgroundColor = Color(0xFFCCFBF1),
@@ -625,7 +555,7 @@ private fun AboutSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .clickable { }
+                        .clickable { onPrivacyPolicyClick() }
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -652,7 +582,7 @@ private fun AboutSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .clickable { }
+                        .clickable { onTermsClick() }
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -672,7 +602,6 @@ private fun AboutSection(
             }
         }
 
-        // App Version
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -702,10 +631,99 @@ private fun AboutSection(
             }
 
             Text(
-                text = "HydroTracker v1.0.2",
+                text = "HydroTracker v$appVersion",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+// ============================================================================
+// Bottom Navigation
+// ============================================================================
+
+@Composable
+private fun SettingsBottomNavigation(
+    onHomeClick: () -> Unit,
+    onProgressClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 24.dp)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            BottomNavItem(
+                icon = Icons.Filled.Home,
+                label = "Home",
+                isSelected = false,
+                onClick = onHomeClick
+            )
+            
+            BottomNavItem(
+                icon = Icons.Filled.BarChart,
+                label = "Progress",
+                isSelected = false,
+                onClick = onProgressClick
+            )
+            
+            BottomNavItem(
+                icon = Icons.Filled.Settings,
+                label = "Settings",
+                isSelected = true,
+                onClick = onSettingsClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomNavItem(
+    icon: ImageVector,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            },
+            modifier = Modifier.size(26.dp)
+        )
+        
+        Text(
+            text = label,
+            style = if (isSelected) {
+                MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+            } else {
+                MaterialTheme.typography.labelSmall
+            },
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            },
+            fontSize = 10.sp
+        )
     }
 }

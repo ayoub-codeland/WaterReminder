@@ -1,7 +1,8 @@
-package com.drinkwater.reminder.features.settings.presentation.componenets
+package com.drinkwater.reminder.features.settings.presentation.main.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -10,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.drinkwater.reminder.features.settings.presentation.main.VolumeUnit
+import com.drinkwater.reminder.core.domain.model.VolumeUnit
 
 /**
  * Toggle component for switching between ML and OZ volume units

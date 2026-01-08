@@ -1,7 +1,11 @@
 package com.drinkwater.reminder.features.settings.presentation.weight
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,35 +17,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.ui.components.AppScaffold
-import com.drinkwater.reminder.features.onboarding.presentation.profile.WeightUnit
-import kotlinx.coroutines.flow.collectLatest
+import com.drinkwater.reminder.core.ui.components.DecrementButton
+import com.drinkwater.reminder.core.ui.components.IncrementButton
+import kotlin.math.roundToInt
 
 @Composable
 fun UpdateWeightScreen(
-    viewModel: UpdateWeightViewModel,
-    onNavigateBack: () -> Unit
+    viewModel: UpdateWeightViewModel
 ) {
     val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is UpdateWeightUiEffect.NavigateBack -> {
-                    onNavigateBack()
-                }
-                is UpdateWeightUiEffect.ShowError -> {
-                    // TODO: Show error toast
-                }
-            }
-        }
-    }
 
     UpdateWeightScreenContent(
         state = state,
@@ -51,8 +44,8 @@ fun UpdateWeightScreen(
 
 @Composable
 private fun UpdateWeightScreenContent(
-    state: UpdateWeightUiState,
-    onEvent: (UpdateWeightUiEvent) -> Unit
+    state: UpdateWeightState,
+    onEvent: (UpdateWeightEvent) -> Unit
 ) {
     AppScaffold(
         topBar = {
@@ -67,7 +60,7 @@ private fun UpdateWeightScreenContent(
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         IconButton(
-                            onClick = { onEvent(UpdateWeightUiEvent.OnBackClick) },
+                            onClick = { onEvent(UpdateWeightEvent.OnBackClick) },
                             modifier = Modifier.align(Alignment.CenterStart)
                         ) {
                             Icon(
@@ -112,10 +105,10 @@ private fun UpdateWeightScreenContent(
                 verticalAlignment = Alignment.Bottom
             ) {
                 BasicTextField(
-                    value = String.format("%.1f", state.weight),
+                    value = "${state.weight}",
                     onValueChange = { value ->
                         value.toFloatOrNull()?.let {
-                            onEvent(UpdateWeightUiEvent.OnWeightChanged(it))
+                            onEvent(UpdateWeightEvent.OnWeightChanged(it))
                         }
                     },
                     textStyle = TextStyle(
@@ -138,41 +131,53 @@ private fun UpdateWeightScreenContent(
             
             WeightUnitToggle(
                 selectedUnit = state.weightUnit,
-                onUnitSelected = { unit -> onEvent(UpdateWeightUiEvent.OnWeightUnitChanged(unit)) },
+                onUnitSelected = { unit -> onEvent(UpdateWeightEvent.OnWeightUnitChanged(unit)) },
                 modifier = Modifier.padding(bottom = 40.dp)
             )
             
-            WeightSlider(
-                weight = state.weight,
-                minWeight = state.minWeight,
-                maxWeight = state.maxWeight,
-                weightUnit = state.weightUnit,
-                onWeightChange = { weight -> onEvent(UpdateWeightUiEvent.OnWeightChanged(weight)) },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(bottom = 48.dp)
-            )
+            // Slider with labels and activity level theme
+            Column(Modifier.fillMaxWidth().padding(bottom = 48.dp)) {
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 4.dp).padding(bottom = 16.dp),
+                    Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "${state.minWeight.toInt()}${if (state.weightUnit == WeightUnit.KG) "kg" else "lbs"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "${state.maxWeight.toInt()}${if (state.weightUnit == WeightUnit.KG) "kg" else "lbs"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                WeightSlider(
+                    weight = state.weight,
+                    minWeight = state.minWeight,
+                    maxWeight = state.maxWeight,
+                    onWeightChange = { weight -> onEvent(UpdateWeightEvent.OnWeightChanged(weight)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             
             Row(
                 horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)
             ) {
-                FilledTonalIconButton(
-                    onClick = { onEvent(UpdateWeightUiEvent.OnDecrementWeight) },
-                    modifier = Modifier.size(64.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(32.dp))
-                }
+                DecrementButton(
+                    onClick = { onEvent(UpdateWeightEvent.OnDecrementWeight) }
+                )
                 
-                FilledTonalIconButton(
-                    onClick = { onEvent(UpdateWeightUiEvent.OnIncrementWeight) },
-                    modifier = Modifier.size(64.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(32.dp))
-                }
+                IncrementButton(
+                    onClick = { onEvent(UpdateWeightEvent.OnIncrementWeight) }
+                )
             }
             
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { onEvent(UpdateWeightUiEvent.OnSaveClick) },
+                onClick = { onEvent(UpdateWeightEvent.OnSaveClick) },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !state.isSaving
@@ -240,46 +245,89 @@ private fun WeightSlider(
     weight: Float,
     minWeight: Float,
     maxWeight: Float,
-    weightUnit: WeightUnit,
     onWeightChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
-        Box(Modifier.fillMaxWidth().height(48.dp), Alignment.Center) {
-            Box(
-                Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        val trackWidth = maxWidth
+
+        // Base track (light gray)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.outlineVariant)
+        )
+
+        // Filled track (blue, proportional to weight value)
+        val normalizedValue = ((weight - minWeight) / (maxWeight - minWeight)).coerceIn(0f, 1f)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(normalizedValue)
+                .height(6.dp)
+                .align(Alignment.CenterStart)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
+
+        // Vertical separator bars ("|") at step positions
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            listOf(0f, 0.25f, 0.5f, 0.75f, 1f).forEach { position ->
                 Box(
-                    Modifier.fillMaxWidth(((weight - minWeight) / (maxWeight - minWeight)).coerceIn(0f, 1f))
-                        .fillMaxHeight().clip(RoundedCornerShape(3.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                )
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .fillMaxWidth(position.coerceAtLeast(0.001f))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(3.dp)
+                            .height(6.dp)
+                            .align(Alignment.CenterEnd)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(MaterialTheme.colorScheme.outlineVariant)
+                    )
+                }
             }
-            
-            Slider(
-                value = weight,
-                onValueChange = onWeightChange,
-                valueRange = minWeight..maxWeight,
-                modifier = Modifier.fillMaxWidth(),
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.surface,
-                    activeTrackColor = Color.Transparent,
-                    inactiveTrackColor = Color.Transparent
-                )
-            )
         }
-        
-        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), Arrangement.SpaceBetween) {
-            Text(
-                "${minWeight.toInt()}${if (weightUnit == WeightUnit.KG) "kg" else "lbs"}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                "${maxWeight.toInt()}${if (weightUnit == WeightUnit.KG) "kg" else "lbs"}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+
+        // Circular indicator (thumb) - white with blue border
+        val indicatorOffset = trackWidth * normalizedValue
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterStart)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, _ ->
+                        change.consume()
+                        val x = change.position.x.coerceIn(0f, size.width.toFloat())
+                        val normalized = x / size.width.toFloat()
+                        // Calculate new weight directly without snapping
+                        val newWeight = minWeight + (normalized * (maxWeight - minWeight))
+                        // Round to 1 decimal place
+                        val roundedWeight = (newWeight * 10).roundToInt() / 10f
+                        onWeightChange(roundedWeight)
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .offset(x = indicatorOffset - 10.dp) // Center the indicator
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(
+                        border = BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
+                        shape = CircleShape
+                    )
             )
         }
     }

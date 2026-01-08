@@ -1,5 +1,8 @@
-package com.drinkwater.reminder.features.onboarding.profile
+package com.drinkwater.reminder.features.onboarding.presentation.profile
 
+import androidx.lifecycle.viewModelScope
+import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.presentation.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

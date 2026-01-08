@@ -1,14 +1,20 @@
 package com.drinkwater.reminder.features.settings.presentation.profile
 
+import androidx.lifecycle.viewModelScope
+import com.drinkwater.reminder.core.domain.model.UserProfile
 import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
+import com.drinkwater.reminder.features.settings.domain.usecase.SaveUserProfileUseCase
 import kotlinx.coroutines.launch
 
 class EditProfileViewModel(
-    private val getUserProfile: GetUserProfileUseCase
+    private val getUserProfile: GetUserProfileUseCase,
+    private val saveUserProfile: SaveUserProfileUseCase
 ) : BaseViewModel<EditProfileState, EditProfileEvent, EditProfileEffect>(
     initialState = EditProfileState(isLoading = true)
 ) {
+
+    private var isSavingInProgress = false
 
     init {
         loadProfile()
@@ -41,12 +47,17 @@ class EditProfileViewModel(
         viewModelScope.launch {
             try {
                 val profile = getUserProfile()
-                updateState {
-                    copy(
-                        biologicalSex = profile?.biologicalSex ?: currentState.biologicalSex,
-                        ageGroup = profile?.ageGroup ?: currentState.ageGroup,
-                        isLoading = false
-                    )
+                if (profile != null) {
+                    updateState {
+                        copy(
+                            displayName = profile.username ?: "",
+                            biologicalSex = profile.biologicalSex,
+                            ageGroup = profile.ageGroup,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    updateState { copy(isLoading = false) }
                 }
             } catch (e: Exception) {
                 updateState { copy(isLoading = false) }
@@ -56,15 +67,33 @@ class EditProfileViewModel(
     }
 
     private fun saveProfile() {
+        if (isSavingInProgress) return
+        isSavingInProgress = true
+        
         updateState { copy(isSaving = true) }
         
         viewModelScope.launch {
             try {
-                // TODO: Save profile with repository
+                val currentProfile = getUserProfile()
+                
+                val updatedProfile = UserProfile(
+                    username = currentState.displayName.takeIf { it.isNotBlank() },
+                    biologicalSex = currentState.biologicalSex,
+                    ageGroup = currentState.ageGroup,
+                    weight = currentProfile?.weight ?: 75.0f,
+                    weightUnit = currentProfile?.weightUnit ?: com.drinkwater.reminder.core.domain.model.WeightUnit.KG,
+                    activityLevel = currentProfile?.activityLevel ?: com.drinkwater.reminder.core.domain.model.ActivityLevel.MODERATE,
+                    dailyGoal = currentProfile?.dailyGoal ?: 2500,
+                    createdAt = currentProfile?.createdAt ?: System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis()
+                )
+                
+                saveUserProfile(updatedProfile)
                 updateState { copy(isSaving = false) }
                 sendEffect(EditProfileEffect.NavigateBack)
             } catch (e: Exception) {
                 updateState { copy(isSaving = false) }
+                isSavingInProgress = false
                 sendEffect(EditProfileEffect.ShowError(e.message ?: "Failed to save"))
             }
         }

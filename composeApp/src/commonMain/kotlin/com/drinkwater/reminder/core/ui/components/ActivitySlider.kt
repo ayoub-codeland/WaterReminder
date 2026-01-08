@@ -12,13 +12,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.drinkwater.reminder.core.theme.*
 import kotlin.math.roundToInt
 
 /**
@@ -51,7 +52,7 @@ fun ActivitySlider(
                 .fillMaxWidth()
                 .height(6.dp)
                 .clip(CircleShape)
-                .background(Slate100)
+                .background(MaterialTheme.colorScheme.outlineVariant)
         )
 
         // Filled track (blue, proportional to value)
@@ -63,7 +64,7 @@ fun ActivitySlider(
                 .height(6.dp)
                 .align(Alignment.CenterStart)
                 .clip(CircleShape)
-                .background(Primary.copy(alpha = 0.3f))
+                .background(MaterialTheme.colorScheme.primary)
         )
 
         // Vertical separator bars ("|") at step positions
@@ -79,11 +80,11 @@ fun ActivitySlider(
                 ) {
                     Box(
                         modifier = Modifier
-                            .width(4.dp)
-                            .height(8.dp)
+                            .width(3.dp)
+                            .height(6.dp)
                             .align(Alignment.CenterEnd)
-                            .clip(CircleShape)
-                            .background(Slate300)
+                            .clip(RoundedCornerShape(3))
+                            .background(MaterialTheme.colorScheme.outlineVariant)
                     )
                 }
             }
@@ -116,9 +117,9 @@ fun ActivitySlider(
                     .size(20.dp)
                     .offset(x = indicatorOffset - 10.dp) // Center the indicator
                     .clip(CircleShape)
-                    .background(White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .border(
-                        border = BorderStroke(2.dp, Primary),
+                        border = BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
                         shape = CircleShape
                     )
             )

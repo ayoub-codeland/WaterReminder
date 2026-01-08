@@ -1,10 +1,11 @@
-package com.drinkwater.reminder.features.dashboard
+package com.drinkwater.reminder.features.dashboard.presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.drinkwater.reminder.core.ui.components.AppScaffold
@@ -141,7 +142,7 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.Bottom
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
                             text = "1,250",

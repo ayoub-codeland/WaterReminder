@@ -1,4 +1,4 @@
-package com.drinkwater.reminder.features.onboarding.profile
+package com.drinkwater.reminder.features.onboarding.presentation.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.AgeGroup
+import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.ui.components.ActivitySlider
 import com.drinkwater.reminder.core.ui.components.AgeGroupButton
 import com.drinkwater.reminder.core.ui.components.AppScaffold

@@ -18,17 +18,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
 
-/**
- * Reusable Increment/Decrement Button Component
- * 
- * Matches design: rounded-2xl (16dp), white background, soft shadow, border
- * 
- * @param onClick Action to perform when button is clicked
- * @param icon Icon to display (Add or Remove)
- * @param modifier Optional modifier
- * @param size Button size (default 64dp for h-16 w-16)
- * @param enabled Whether button is enabled
- */
 @Composable
 fun IncrementDecrementButton(
     onClick: () -> Unit,
@@ -48,7 +37,7 @@ fun IncrementDecrementButton(
             modifier = Modifier
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant, // border-slate-100
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     shape = RoundedCornerShape(16.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -56,8 +45,8 @@ fun IncrementDecrementButton(
             Icon(
                 imageVector = icon,
                 contentDescription = if (icon == Icons.Default.Add) "Increment" else "Decrement",
-                tint = MaterialTheme.colorScheme.onSurface, // text-slate-900
-                modifier = Modifier.size(32.dp) // text-[32px]
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(32.dp)
             )
         }
     }

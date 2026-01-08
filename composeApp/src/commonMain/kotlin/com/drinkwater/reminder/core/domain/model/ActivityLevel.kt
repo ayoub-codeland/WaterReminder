@@ -1,11 +1,14 @@
 package com.drinkwater.reminder.core.domain.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Activity level for calculating hydration needs
  * 
  * Domain model - represents core business concept
  * Higher activity levels require more water intake
  */
+@Serializable
 enum class ActivityLevel(
     val multiplier: Float,
     val displayName: String,

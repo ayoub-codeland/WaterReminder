@@ -1,5 +1,6 @@
 package com.drinkwater.reminder.features.settings.presentation.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,28 +22,12 @@ import com.drinkwater.reminder.core.domain.model.AgeGroup
 import com.drinkwater.reminder.core.domain.model.BiologicalSex
 import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditProfileScreen(
-    viewModel: EditProfileViewModel,
-    onNavigateBack: () -> Unit
+    viewModel: EditProfileViewModel
 ) {
     val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is EditProfileEffect.NavigateBack -> onNavigateBack()
-                is EditProfileEffect.ShowError -> {
-                    // TODO: Show error toast
-                }
-                is EditProfileEffect.OpenImagePicker -> {
-                    // TODO: Open image picker
-                }
-            }
-        }
-    }
 
     EditProfileScreenContent(
         state = state,
@@ -78,13 +63,13 @@ private fun EditProfileScreenContent(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        
+
                         Text(
                             text = "Edit Profile",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        
+
                         TextButton(
                             onClick = { onEvent(EditProfileEvent.OnSaveClick) },
                             enabled = !state.isSaving
@@ -106,7 +91,7 @@ private fun EditProfileScreenContent(
                         }
                     }
                 }
-                
+
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                 )
@@ -148,7 +133,7 @@ private fun EditProfileScreenContent(
                             modifier = Modifier.size(48.dp)
                         )
                     }
-                    
+
                     // Camera button
                     Surface(
                         onClick = { onEvent(EditProfileEvent.OnProfileImageClick) },
@@ -201,7 +186,7 @@ private fun EditProfileScreenContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    
+
                     OutlinedTextField(
                         value = state.displayName,
                         onValueChange = { onEvent(EditProfileEvent.OnNameChanged(it)) },
@@ -234,7 +219,7 @@ private fun EditProfileScreenContent(
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(start = 4.dp)
                     )
-                    
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -242,14 +227,26 @@ private fun EditProfileScreenContent(
                         BiologicalSexCard(
                             sex = BiologicalSex.MALE,
                             isSelected = state.biologicalSex == BiologicalSex.MALE,
-                            onClick = { onEvent(EditProfileEvent.OnBiologicalSexChanged(BiologicalSex.MALE)) },
+                            onClick = {
+                                onEvent(
+                                    EditProfileEvent.OnBiologicalSexChanged(
+                                        BiologicalSex.MALE
+                                    )
+                                )
+                            },
                             modifier = Modifier.weight(1f)
                         )
-                        
+
                         BiologicalSexCard(
                             sex = BiologicalSex.FEMALE,
                             isSelected = state.biologicalSex == BiologicalSex.FEMALE,
-                            onClick = { onEvent(EditProfileEvent.OnBiologicalSexChanged(BiologicalSex.FEMALE)) },
+                            onClick = {
+                                onEvent(
+                                    EditProfileEvent.OnBiologicalSexChanged(
+                                        BiologicalSex.FEMALE
+                                    )
+                                )
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -267,7 +264,7 @@ private fun EditProfileScreenContent(
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(start = 4.dp)
                     )
-                    
+
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -282,7 +279,7 @@ private fun EditProfileScreenContent(
                                 onClick = { onEvent(EditProfileEvent.OnAgeGroupChanged(AgeGroup.AGE_18_30)) },
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             AgeGroupCard(
                                 ageGroup = AgeGroup.AGE_31_50,
                                 isSelected = state.ageGroup == AgeGroup.AGE_31_50,
@@ -290,7 +287,7 @@ private fun EditProfileScreenContent(
                                 modifier = Modifier.weight(1f)
                             )
                         }
-                        
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -301,7 +298,7 @@ private fun EditProfileScreenContent(
                                 onClick = { onEvent(EditProfileEvent.OnAgeGroupChanged(AgeGroup.AGE_51_60)) },
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             AgeGroupCard(
                                 ageGroup = AgeGroup.AGE_60_PLUS,
                                 isSelected = state.ageGroup == AgeGroup.AGE_60_PLUS,
@@ -329,26 +326,22 @@ private fun BiologicalSexCard(
             "Male",
             MaterialTheme.colorScheme.primary
         )
+
         BiologicalSex.FEMALE -> Triple(
             Icons.Default.Female,
             "Female",
-            Color(0xFFEC4899) // pink-500
+            Color(0xFFEC4899)
         )
     }
-    
+
     Surface(
         onClick = onClick,
-        modifier = modifier.height(120.dp),
+        modifier = modifier.height(120.dp).shadowSm(RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
-        color = if (isSelected)
-            MaterialTheme.colorScheme.outlineVariant
-        else
-            MaterialTheme.colorScheme.surface,
         border = if (isSelected)
-            androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         else
-            androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        shadowElevation = 1.dp
+            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -371,28 +364,28 @@ private fun BiologicalSexCard(
                         Icon(
                             imageVector = icon,
                             contentDescription = label,
-                            tint = if (isSelected) 
-                                MaterialTheme.colorScheme.surface 
-                            else 
+                            tint = if (isSelected)
+                                MaterialTheme.colorScheme.surface
+                            else
                                 iconColor,
                             modifier = Modifier.size(24.dp)
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    color = if (isSelected) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    color = if (isSelected)
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             if (isSelected) {
                 Surface(
                     modifier = Modifier
@@ -431,9 +424,12 @@ private fun AgeGroupCard(
         modifier = modifier.height(48.dp).shadowSm(RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
         border = if (isSelected)
-            androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         else
-            androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant
+            ),
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -443,9 +439,9 @@ private fun AgeGroupCard(
                 text = ageGroup.toDisplayLabel(),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                color = if (isSelected) 
-                    MaterialTheme.colorScheme.primary 
-                else 
+                color = if (isSelected)
+                    MaterialTheme.colorScheme.primary
+                else
                     MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

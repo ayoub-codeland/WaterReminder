@@ -1,4 +1,4 @@
-package com.drinkwater.reminder.features.onboarding.welcome
+package com.drinkwater.reminder.features.onboarding.presentation.welcome
 
 import com.drinkwater.reminder.core.presentation.UiEffect
 import com.drinkwater.reminder.core.presentation.UiEvent

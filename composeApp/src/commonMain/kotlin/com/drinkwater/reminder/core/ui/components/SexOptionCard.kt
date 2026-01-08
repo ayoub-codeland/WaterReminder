@@ -10,21 +10,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.drinkwater.reminder.core.theme.*
 
 /**
  * Biological Sex option card
  *
- * Uses theme colors from Color.kt (matches HTML design)
+ * Uses theme typography and colors (NO hardcoded styles)
+ *
+ * HTML reference:
+ * - Selected: text-sm font-bold = titleSmall
+ * - Unselected: text-sm font-medium = titleMedium
  */
 @Composable
 fun SexOptionCard(
@@ -45,12 +47,18 @@ fun SexOptionCard(
                 .border(
                     border = BorderStroke(
                         width = if (selected) 2.dp else 1.dp,
-                        color = if (selected) Primary else SubtleBorder
+                        color = if (selected)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.outlineVariant
                     ),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .background(
-                    color = if (selected) Primary.copy(alpha = 0.05f) else SurfaceLight
+                    color = if (selected)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.surface
                 )
                 .clickable(onClick = onClick)
                 .padding(20.dp)
@@ -64,17 +72,22 @@ fun SexOptionCard(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(36.dp),
-                    tint = if (selected) Primary else Slate400
+                    tint = if (selected)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.outline
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Text
+                // Text - Uses theme typography
                 Text(
                     text = label,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (selected) Primary else Slate600
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (selected)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
@@ -84,12 +97,12 @@ fun SexOptionCard(
             Box(
                 modifier = Modifier
                     .size(24.dp)
-                    .offset(x = (-8).dp, y = (-8).dp)
-                    .align(Alignment.TopEnd)
+                    .align(Alignment.TopEnd)           // Position at top-right corner
+                    .offset(x = 8.dp, y = (-8).dp)
                     .clip(CircleShape)
-                    .background(Primary)
+                    .background(MaterialTheme.colorScheme.primary)
                     .border(
-                        border = BorderStroke(2.dp, White),
+                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -98,7 +111,7 @@ fun SexOptionCard(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Selected",
                     modifier = Modifier.size(14.dp),
-                    tint = White
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
