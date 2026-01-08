@@ -2,6 +2,7 @@ package com.drinkwater.reminder.features.home.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.drinkwater.reminder.core.domain.repository.UserProfileRepository
+import com.drinkwater.reminder.core.domain.usecase.GetDailyTipUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
 import com.drinkwater.reminder.features.home.domain.usecase.AddWaterIntakeUseCase
 import com.drinkwater.reminder.features.home.domain.usecase.GetCurrentStreakUseCase
@@ -24,7 +25,8 @@ class HomeViewModel(
     private val addWaterIntakeUseCase: AddWaterIntakeUseCase,
     private val getTodayIntakeUseCase: GetTodayIntakeUseCase,
     private val getCurrentStreakUseCase: GetCurrentStreakUseCase,
-    private val resetTodayIntakeUseCase: ResetTodayIntakeUseCase
+    private val resetTodayIntakeUseCase: ResetTodayIntakeUseCase,
+    private val getDailyTipUseCase: GetDailyTipUseCase
 ) : BaseViewModel<HomeState, HomeEvent, HomeSideEffect>(
     initialState = HomeState()
 ) {
@@ -34,6 +36,7 @@ class HomeViewModel(
         observeTodayIntake()
         updateDateAndGreeting()
         loadStreak()
+        loadDailyTip()
     }
     
     override fun onEvent(event: HomeEvent) {
@@ -71,7 +74,7 @@ class HomeViewModel(
                 
                 updateState {
                     copy(
-                        userName = profile?.let { "Alex" } ?: "User",
+                        userName = profile?.username ?: "User",
                         dailyGoal = dailyGoal,
                         isLoading = false
                     )
@@ -110,6 +113,18 @@ class HomeViewModel(
                 updateState { copy(currentStreak = streak) }
             } catch (e: Exception) {
                 // Keep existing streak value on error
+            }
+        }
+    }
+    
+    private fun loadDailyTip() {
+        viewModelScope.launch {
+            try {
+                val tip = getDailyTipUseCase()
+                updateState { copy(dailyTip = tip) }
+            } catch (e: Exception) {
+                // Keep default tip on error
+                println("Failed to load daily tip: ${e.message}")
             }
         }
     }
