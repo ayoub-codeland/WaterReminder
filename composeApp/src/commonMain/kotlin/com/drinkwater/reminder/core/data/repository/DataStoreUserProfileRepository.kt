@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drinkwater.reminder.core.domain.model.*
 import com.drinkwater.reminder.core.domain.repository.UserProfileRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -36,19 +37,23 @@ class DataStoreUserProfileRepository(
     }
     
     override suspend fun getProfile(): UserProfile? {
+        return observeProfile().first()
+    }
+    
+    override fun observeProfile(): Flow<UserProfile?> {
         return dataStore.data.map { preferences ->
             val weight = preferences[Keys.WEIGHT] ?: return@map null
-            
+
             UserProfile(
                 username = preferences[Keys.USERNAME],
-                biologicalSex = preferences[Keys.BIOLOGICAL_SEX]?.let { 
+                biologicalSex = preferences[Keys.BIOLOGICAL_SEX]?.let {
                     try {
                         BiologicalSex.valueOf(it)
                     } catch (e: IllegalArgumentException) {
                         BiologicalSex.MALE
                     }
                 } ?: BiologicalSex.MALE,
-                ageGroup = preferences[Keys.AGE_GROUP]?.let { 
+                ageGroup = preferences[Keys.AGE_GROUP]?.let {
                     try {
                         AgeGroup.valueOf(it)
                     } catch (e: IllegalArgumentException) {
@@ -56,14 +61,14 @@ class DataStoreUserProfileRepository(
                     }
                 } ?: AgeGroup.AGE_18_30,
                 weight = weight,
-                weightUnit = preferences[Keys.WEIGHT_UNIT]?.let { 
+                weightUnit = preferences[Keys.WEIGHT_UNIT]?.let {
                     try {
                         WeightUnit.valueOf(it)
                     } catch (e: IllegalArgumentException) {
                         WeightUnit.KG
                     }
                 } ?: WeightUnit.KG,
-                activityLevel = preferences[Keys.ACTIVITY_LEVEL]?.let { 
+                activityLevel = preferences[Keys.ACTIVITY_LEVEL]?.let {
                     try {
                         ActivityLevel.valueOf(it)
                     } catch (e: IllegalArgumentException) {
@@ -74,28 +79,28 @@ class DataStoreUserProfileRepository(
                 createdAt = preferences[Keys.CREATED_AT] ?: 0L,
                 updatedAt = preferences[Keys.UPDATED_AT] ?: 0L
             )
-        }.first()
+        }
     }
     
     override suspend fun saveProfile(profile: UserProfile) {
         val currentTimeMillis = System.currentTimeMillis()
-        
+
         dataStore.edit { preferences ->
-            profile.username?.let { 
-                preferences[Keys.USERNAME] = it 
+            profile.username?.let {
+                preferences[Keys.USERNAME] = it
             }
-            
+
             preferences[Keys.BIOLOGICAL_SEX] = profile.biologicalSex.name
             preferences[Keys.AGE_GROUP] = profile.ageGroup.name
             preferences[Keys.WEIGHT] = profile.weight
             preferences[Keys.WEIGHT_UNIT] = profile.weightUnit.name
             preferences[Keys.ACTIVITY_LEVEL] = profile.activityLevel.name
             preferences[Keys.DAILY_GOAL] = profile.dailyGoal
-            
+
             if (preferences[Keys.CREATED_AT] == null) {
                 preferences[Keys.CREATED_AT] = currentTimeMillis
             }
-            
+
             preferences[Keys.UPDATED_AT] = currentTimeMillis
         }
     }
@@ -137,7 +142,7 @@ class DataStoreUserProfileRepository(
     
     override suspend fun getVolumeUnit(): VolumeUnit {
         return dataStore.data.map { preferences ->
-            preferences[Keys.VOLUME_UNIT]?.let { 
+            preferences[Keys.VOLUME_UNIT]?.let {
                 try {
                     VolumeUnit.valueOf(it)
                 } catch (e: IllegalArgumentException) {

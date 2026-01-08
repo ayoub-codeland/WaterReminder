@@ -5,6 +5,8 @@ import com.drinkwater.reminder.core.domain.model.UserProfile
 import com.drinkwater.reminder.core.domain.model.VolumeUnit
 import com.drinkwater.reminder.core.domain.model.WeightUnit
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * Repository interface for user profile data
  * 
@@ -22,6 +24,12 @@ interface UserProfileRepository {
      * Returns null if no profile exists yet
      */
     suspend fun getProfile(): UserProfile?
+    
+    /**
+     * Observe user profile changes as a Flow
+     * Returns null if no profile exists yet
+     */
+    fun observeProfile(): Flow<UserProfile?>
     
     /**
      * Update user's weight

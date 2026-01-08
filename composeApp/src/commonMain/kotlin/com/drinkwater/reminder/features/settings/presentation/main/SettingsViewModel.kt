@@ -1,6 +1,14 @@
-package com.drinkwater.reminder.features.settings
+package com.drinkwater.reminder.features.settings.presentation.main
 
+import androidx.lifecycle.viewModelScope
+import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.VolumeUnit
+import com.drinkwater.reminder.core.domain.model.WeightUnit
+import com.drinkwater.reminder.core.domain.repository.UserProfileRepository
+import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel for Settings Screen
@@ -8,53 +16,84 @@ import com.drinkwater.reminder.core.presentation.BaseViewModel
  * Follows Clean Architecture and SOLID principles
  * Implements Unidirectional Data Flow (UDF) pattern
  */
-class SettingsViewModel : BaseViewModel<SettingsUiState, SettingsUiEvent, SettingsUiEffect>(
-    initialState = SettingsUiState()
+class SettingsViewModel(
+    private val getUserProfile: GetUserProfileUseCase,
+    private val repository: UserProfileRepository
+) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
+    initialState = SettingsState()
 ) {
 
-    override fun onEvent(event: SettingsUiEvent) {
+    init {
+        observeUserProfile()
+    }
+
+    override fun onEvent(event: SettingsEvent) {
         when (event) {
-            is SettingsUiEvent.OnEditProfileClick -> {
-                sendEffect(SettingsUiEffect.NavigateToEditProfile)
+            is SettingsEvent.OnBackClick -> {
+                sendEffect(SettingsEffect.NavigateToGoalSettings)
+            }
+            is SettingsEvent.OnEditProfileClick -> {
+                sendEffect(SettingsEffect.NavigateToEditProfile)
             }
 
-            is SettingsUiEvent.OnWeightClick -> {
-                sendEffect(SettingsUiEffect.NavigateToWeightSettings)
+            is SettingsEvent.OnWeightClick -> {
+                sendEffect(SettingsEffect.NavigateToWeightSettings)
             }
 
-            is SettingsUiEvent.OnActivityLevelClick -> {
-                sendEffect(SettingsUiEffect.NavigateToActivitySettings)
+            is SettingsEvent.OnActivityLevelClick -> {
+                sendEffect(SettingsEffect.NavigateToActivitySettings)
             }
 
-            is SettingsUiEvent.OnDailyGoalClick -> {
-                sendEffect(SettingsUiEffect.NavigateToGoalSettings)
+            is SettingsEvent.OnDailyGoalClick -> {
+                sendEffect(SettingsEffect.NavigateToGoalSettings)
             }
 
-            is SettingsUiEvent.OnNotificationPreferencesClick -> {
-                sendEffect(SettingsUiEffect.NavigateToNotifications)
+            is SettingsEvent.OnNotificationPreferencesClick -> {
+                sendEffect(SettingsEffect.NavigateToNotifications)
             }
 
-            is SettingsUiEvent.OnVolumeUnitChanged -> {
+            is SettingsEvent.OnVolumeUnitChanged -> {
                 handleVolumeUnitChange(event.unit)
             }
 
-            is SettingsUiEvent.OnStartOfWeekClick -> {
-                sendEffect(SettingsUiEffect.NavigateToStartOfWeek)
+            is SettingsEvent.OnStartOfWeekClick -> {
+                sendEffect(SettingsEffect.NavigateToStartOfWeek)
             }
 
-            is SettingsUiEvent.OnPrivacyPolicyClick -> {
-                sendEffect(SettingsUiEffect.OpenUrl("https://example.com/privacy"))
+            is SettingsEvent.OnPrivacyPolicyClick -> {
+                sendEffect(SettingsEffect.OpenUrl("https://example.com/privacy"))
             }
 
-            is SettingsUiEvent.OnTermsOfServiceClick -> {
-                sendEffect(SettingsUiEffect.OpenUrl("https://example.com/terms"))
+            is SettingsEvent.OnTermsOfServiceClick -> {
+                sendEffect(SettingsEffect.OpenUrl("https://example.com/terms"))
+            }
+        }
+    }
+
+    private fun observeUserProfile() {
+        viewModelScope.launch {
+            try {
+                repository.observeProfile().collectLatest { profile ->
+                    updateState {
+                        copy(
+                            weight = profile?.weight ?: 75f,
+                            weightUnit = profile?.weightUnit ?: WeightUnit.KG,
+                            activityLevel = profile?.activityLevel ?: ActivityLevel.MODERATE,
+                            dailyGoal = profile?.dailyGoal ?: 2500,
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                updateState { copy(isLoading = false) }
             }
         }
     }
 
     private fun handleVolumeUnitChange(unit: VolumeUnit) {
-        updateState {
-            copy(volumeUnit = unit)
+        viewModelScope.launch {
+            // TODO: Save to repository
+            updateState { copy(volumeUnit = unit) }
         }
     }
 }
