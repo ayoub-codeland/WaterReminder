@@ -44,8 +44,11 @@ fun ProgressScreen(
                 onSettingsClick = { viewModel.onEvent(ProgressEvent.OnNavigateToSettings) }
             )
         }
-    ) { _ ->
-        ProgressContent(state = state)
+    ) { paddingValues ->
+        ProgressContent(
+            state = state,
+            modifier = Modifier.padding(paddingValues)
+        )
     }
 }
 
@@ -89,9 +92,12 @@ private fun ProgressTopBar(onSettingsClick: () -> Unit) {
 }
 
 @Composable
-private fun ProgressContent(state: ProgressState) {
+private fun ProgressContent(
+    state: ProgressState,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
