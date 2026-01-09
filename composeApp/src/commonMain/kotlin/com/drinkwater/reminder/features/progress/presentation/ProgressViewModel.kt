@@ -32,8 +32,6 @@ class ProgressViewModel(
     override fun onEvent(event: ProgressEvent) {
         when (event) {
             ProgressEvent.OnRefresh -> loadData()
-            ProgressEvent.OnNavigateToHome -> sendEffect(ProgressSideEffect.NavigateToHome)
-            ProgressEvent.OnNavigateToSettings -> sendEffect(ProgressSideEffect.NavigateToSettings)
         }
     }
     

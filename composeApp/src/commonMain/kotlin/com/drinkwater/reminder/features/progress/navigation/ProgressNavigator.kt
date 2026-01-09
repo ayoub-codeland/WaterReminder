@@ -4,25 +4,21 @@ import androidx.navigation.NavHostController
 
 /**
  * Navigator for Progress feature
+ * Handles ONLY deep navigation within the progress feature
  *
- * Note: Bottom navigation is handled at app level.
- * This navigator is for deep navigation within the progress feature.
+ * Note: Bottom navigation and tab switching is handled at app level (App.kt).
+ * BackHandler in ProgressScreen handles back button to navigate to home.
+ * This navigator is ONLY for progress sub-screens (if any are added in future).
+ * Currently progress has no sub-screens, so this navigator has minimal functionality.
  */
 class ProgressNavigator(
     private val navController: NavHostController
 ) {
     fun navigateToHome() {
+        // Called by BackHandler from ProgressScreen
+        // Clear entire back stack and navigate to home
         navController.navigate("home_graph") {
-            // Clear back stack to home
-            popUpTo("home_graph") { inclusive = true }
-            launchSingleTop = true
-        }
-    }
-
-    fun navigateToSettings() {
-        navController.navigate("settings_graph") {
-            // Keep home in back stack
-            popUpTo("home_graph") { inclusive = false }
+            popUpTo(0) { inclusive = true }
             launchSingleTop = true
         }
     }

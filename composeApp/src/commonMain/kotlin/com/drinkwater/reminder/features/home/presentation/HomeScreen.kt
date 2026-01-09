@@ -30,12 +30,13 @@ import com.drinkwater.reminder.features.home.presentation.components.WaterCupCom
  *
  * Main screen showing water intake progress with WaterCupComponent
  * Navigation bar is handled at app level for consistency across all screens
+ *
+ * Note: Tab navigation is handled at app level (App.kt), not via callbacks.
+ * This keeps the feature decoupled and follows Clean Architecture principles.
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
-    onNavigateToProgress: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    viewModel: HomeViewModel
 ) {
     val state by viewModel.state.collectAsState()
 

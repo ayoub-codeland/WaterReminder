@@ -59,9 +59,14 @@ import com.drinkwater.reminder.core.ui.extensions.shadowSm
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateToHome: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+
+    // Intercept back button - navigate to home instead of cycling through tabs
+    androidx.activity.compose.BackHandler {
+        onNavigateToHome()
+    }
 
     Column(
         modifier = Modifier

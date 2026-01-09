@@ -34,17 +34,13 @@ private fun NavGraphBuilder.homeMainScreen(
     composable(HomeDestination.Main.route) {
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<HomeViewModel>()
-        
+
         HomeScreen(
-            viewModel = viewModel,
-            onNavigateToProgress = navigator::navigateToProgress,
-            onNavigateToSettings = navigator::navigateToSettings
+            viewModel = viewModel
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
-                HomeSideEffect.NavigateToProgress -> navigator.navigateToProgress()
-                HomeSideEffect.NavigateToSettings -> navigator.navigateToSettings()
                 HomeSideEffect.ShowGoalReachedCelebration -> {
                     // TODO: Show celebration animation or dialog
                 }

@@ -54,11 +54,7 @@ class HomeViewModel(
             
             // Daily tip
             HomeEvent.OnDismissDailyTip -> dismissDailyTip()
-            
-            // Navigation
-            HomeEvent.OnNavigateToProgress -> sendEffect(HomeSideEffect.NavigateToProgress)
-            HomeEvent.OnNavigateToSettings -> sendEffect(HomeSideEffect.NavigateToSettings)
-            
+
             // Reset
             HomeEvent.OnResetIntake -> resetIntake()
         }

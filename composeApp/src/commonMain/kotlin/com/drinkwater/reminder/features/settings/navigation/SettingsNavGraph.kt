@@ -50,10 +50,10 @@ private fun NavGraphBuilder.settingsMainScreen(
     composable(SettingsDestination.Main.route) {
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<SettingsViewModel>()
-        
+
         SettingsScreen(
             viewModel = viewModel,
-            onNavigateBack = navigator::navigateBack
+            onNavigateToHome = navigator::navigateToHome
         )
         
         HandleEffects(viewModel.effect) { effect ->

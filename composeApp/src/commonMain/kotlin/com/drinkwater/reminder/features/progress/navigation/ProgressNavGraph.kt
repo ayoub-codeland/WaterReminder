@@ -32,17 +32,14 @@ private fun NavGraphBuilder.progressMainScreen(
 ) {
     composable(ProgressDestination.Main.route) {
         val viewModel = koinViewModel<ProgressViewModel>()
-        
+
         ProgressScreen(
             viewModel = viewModel,
-            onNavigateToHome = navigator::navigateToHome,
-            onNavigateToSettings = navigator::navigateToSettings
+            onNavigateToHome = navigator::navigateToHome
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
-                ProgressSideEffect.NavigateToHome -> navigator.navigateToHome()
-                ProgressSideEffect.NavigateToSettings -> navigator.navigateToSettings()
                 is ProgressSideEffect.ShowError -> {
                     // TODO: Show error snackbar
                 }

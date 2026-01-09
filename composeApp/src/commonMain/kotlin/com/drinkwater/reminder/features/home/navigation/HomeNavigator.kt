@@ -4,30 +4,15 @@ import androidx.navigation.NavHostController
 
 /**
  * Navigator for Home feature
- * Handles navigation actions from the Home screen
+ * Handles ONLY deep navigation within the home feature
  *
- * Note: Bottom navigation is handled at app level.
- * This navigator is for deep navigation within the home feature.
+ * Note: Bottom navigation and tab switching is handled at app level (App.kt).
+ * This navigator is ONLY for home sub-screens (if any are added in future).
+ * Currently home has no sub-screens, so this navigator has minimal functionality.
  */
 class HomeNavigator(
     private val navController: NavHostController
 ) {
-    fun navigateToProgress() {
-        navController.navigate("progress_graph") {
-            // Keep home in back stack
-            popUpTo("home_graph") { inclusive = false }
-            launchSingleTop = true
-        }
-    }
-
-    fun navigateToSettings() {
-        navController.navigate("settings_graph") {
-            // Keep home in back stack
-            popUpTo("home_graph") { inclusive = false }
-            launchSingleTop = true
-        }
-    }
-
     fun navigateBack() {
         // Safely handle back navigation
         if (!navController.popBackStack()) {

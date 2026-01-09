@@ -4,31 +4,18 @@ import androidx.navigation.NavController
 
 /**
  * Navigator for Settings feature
- * Handles navigation within settings and to other main tabs
+ * Handles ONLY deep navigation within the settings feature
  *
- * Note: Bottom navigation is handled at app level.
- * This navigator handles deep navigation within settings.
+ * Note: Bottom navigation and tab switching is handled at app level.
+ * This navigator is ONLY for settings sub-screens (Edit Profile, Update Weight, etc.)
  */
 class SettingsNavigator(private val navController: NavController) {
 
-    fun navigateToMain() {
-        navController.navigate(SettingsDestination.Main.route) {
-            launchSingleTop = true
-        }
-    }
-
     fun navigateToHome() {
+        // Called by BackHandler from SettingsScreen main screen
+        // Clear entire back stack and navigate to home
         navController.navigate("home_graph") {
-            // Clear back stack to home
-            popUpTo("home_graph") { inclusive = true }
-            launchSingleTop = true
-        }
-    }
-
-    fun navigateToProgress() {
-        navController.navigate("progress_graph") {
-            // Keep home in back stack
-            popUpTo("home_graph") { inclusive = false }
+            popUpTo(0) { inclusive = true }
             launchSingleTop = true
         }
     }

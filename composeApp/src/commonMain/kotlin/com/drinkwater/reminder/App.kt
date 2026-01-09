@@ -50,8 +50,8 @@ fun App() {
                         // Prevent navigation if already on home tab
                         if (currentTab != AppNavigationTab.HOME) {
                             navController.navigate("home_graph") {
-                                // Clear back stack to home
-                                popUpTo("home_graph") { inclusive = true }
+                                // Clear entire back stack - tabs are peers, not hierarchical
+                                popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }
@@ -60,8 +60,8 @@ fun App() {
                         // Prevent navigation if already on progress tab
                         if (currentTab != AppNavigationTab.PROGRESS) {
                             navController.navigate("progress_graph") {
-                                // Keep home in back stack
-                                popUpTo("home_graph") { inclusive = false }
+                                // Clear entire back stack - tabs are peers, not hierarchical
+                                popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }
@@ -70,8 +70,8 @@ fun App() {
                         // Prevent navigation if already on settings tab
                         if (currentTab != AppNavigationTab.SETTINGS) {
                             navController.navigate("settings_graph") {
-                                // Keep home in back stack
-                                popUpTo("home_graph") { inclusive = false }
+                                // Clear entire back stack - tabs are peers, not hierarchical
+                                popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }

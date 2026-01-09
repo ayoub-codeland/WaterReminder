@@ -27,15 +27,19 @@ import com.drinkwater.reminder.core.ui.extensions.shadowSm
 @Composable
 fun ProgressScreen(
     viewModel: ProgressViewModel,
-    onNavigateToHome: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToHome: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+
+    // Intercept back button - navigate to home instead of cycling through tabs
+    androidx.activity.compose.BackHandler {
+        onNavigateToHome()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        ProgressTopBar(onSettingsClick = { viewModel.onEvent(ProgressEvent.OnNavigateToSettings) })
+        ProgressTopBar()
 
         ProgressContent(
             state = state,
@@ -46,7 +50,7 @@ fun ProgressScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProgressTopBar(onSettingsClick: () -> Unit) {
+private fun ProgressTopBar() {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
@@ -61,24 +65,13 @@ private fun ProgressTopBar(onSettingsClick: () -> Unit) {
         ) {
             // Empty spacer for balance
             Box(modifier = Modifier.size(40.dp))
-            
+
             Text(
                 text = "Progress",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
-            IconButton(
-                onClick = onSettingsClick,
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
     }
 }
@@ -103,7 +96,7 @@ private fun ProgressContent(
             currentStreak = state.currentStreak,
             chartData = state.chartData
         )
-        
+
         // Stats Grid
         StatsGrid(
             dailyAverage = state.dailyAverage,
@@ -115,7 +108,7 @@ private fun ProgressContent(
             completionRate = state.completionRate,
             daysMetGoal = state.daysMetGoal
         )
-        
+
         // Smart Tip
         SmartTipCard(tip = state.smartTip)
     }
@@ -159,7 +152,7 @@ private fun WeeklySummarySection(
                     )
                 }
             }
-            
+
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -170,7 +163,10 @@ private fun WeeklySummarySection(
                     Surface(
                         shape = RoundedCornerShape(4.dp),
                         color = if (isPositive) Color(0xFFDCFCE7) else Color(0xFFFEE2E2),
-                        border = BorderStroke(1.dp, if (isPositive) Color(0xFFBBF7D0) else Color(0xFFFECACA))
+                        border = BorderStroke(
+                            1.dp,
+                            if (isPositive) Color(0xFFBBF7D0) else Color(0xFFFECACA)
+                        )
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -192,7 +188,7 @@ private fun WeeklySummarySection(
                         }
                     }
                 }
-                
+
                 // Streak badge
                 if (currentStreak > 0) {
                     Surface(
@@ -222,7 +218,7 @@ private fun WeeklySummarySection(
                 }
             }
         }
-        
+
         // Weekly Chart
         WeeklyChart(chartData = chartData)
     }
@@ -255,7 +251,7 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
                     thickness = 2.dp,
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
-                
+
                 // Goal label
                 Text(
                     text = "GOAL",
@@ -269,7 +265,7 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
                         .padding(horizontal = 4.dp)
                 )
             }
-            
+
             // Bars
             Row(
                 modifier = Modifier
@@ -290,7 +286,7 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
 private fun DayBar(data: DayChartData) {
     val maxHeight = 160.dp
     val barHeight = (maxHeight.value * data.progress.coerceAtMost(1f)).dp
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -327,7 +323,7 @@ private fun DayBar(data: DayChartData) {
                 }
             }
         }
-        
+
         // Day label
         Text(
             text = data.dayLabel,
@@ -363,11 +359,11 @@ private fun StatsGrid(
                 label = "Daily Avg",
                 value = dailyAverage,
                 subValue = dailyAverageChange,
-                subValueColor = if (dailyAverageChange?.startsWith("+") == true) 
+                subValueColor = if (dailyAverageChange?.startsWith("+") == true)
                     Color(0xFF16A34A) else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
-            
+
             StatCard(
                 icon = Icons.Outlined.Functions,
                 label = "Total",
@@ -376,7 +372,7 @@ private fun StatsGrid(
                 modifier = Modifier.weight(1f)
             )
         }
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -388,7 +384,7 @@ private fun StatsGrid(
                 subValue = bestDayAmount,
                 modifier = Modifier.weight(1f)
             )
-            
+
             StatCard(
                 icon = Icons.Outlined.CheckCircle,
                 label = "Completion",
@@ -437,14 +433,14 @@ private fun StatCard(
                     letterSpacing = 0.5.sp
                 )
             }
-            
+
             Text(
                 text = value,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             subValue?.let {
                 Text(
                     text = it,
@@ -475,7 +471,7 @@ private fun SmartTipCard(tip: String) {
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
-            
+
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = "Smart Tip",

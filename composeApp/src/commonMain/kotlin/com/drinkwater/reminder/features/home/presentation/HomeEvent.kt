@@ -21,11 +21,7 @@ sealed interface HomeEvent : UiEvent {
     
     // Daily tip
     data object OnDismissDailyTip : HomeEvent
-    
-    // Navigation events
-    data object OnNavigateToProgress : HomeEvent
-    data object OnNavigateToSettings : HomeEvent
-    
+
     // Reset (for testing/debugging)
     data object OnResetIntake : HomeEvent
 }
