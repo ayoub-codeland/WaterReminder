@@ -18,14 +18,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -49,15 +46,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
 import com.drinkwater.reminder.core.domain.model.VolumeUnit
 import com.drinkwater.reminder.core.domain.model.WeightUnit
-import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
 
+/**
+ * Settings Screen
+ * Navigation bar is handled at app level for consistency across all screens
+ */
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -65,26 +63,13 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    AppScaffold(
-        topBar = {
-
-        },
-        bottomBar = {
-            SettingsBottomNavigation(
-                onHomeClick = { viewModel.onEvent(SettingsEvent.OnBackClick) },
-                onProgressClick = { /* Navigate to Progress */ },
-                onSettingsClick = { /* Already on Settings */ }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.colorScheme.background)
-                .padding(bottom = 24.dp)
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
+            .padding(bottom = 24.dp)
+    ) {
             ProfileCard(
                 userName = state.userName,
                 dailyGoal = state.dailyGoal,
@@ -135,7 +120,6 @@ fun SettingsScreen(
                     viewModel.onEvent(SettingsEvent.OnTermsOfServiceClick)
                 }
             )
-        }
     }
 }
 
@@ -667,94 +651,5 @@ private fun AboutSection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-// ============================================================================
-// Bottom Navigation
-// ============================================================================
-
-@Composable
-private fun SettingsBottomNavigation(
-    onHomeClick: () -> Unit,
-    onProgressClick: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 24.dp)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            BottomNavItem(
-                icon = Icons.Filled.Home,
-                label = "Home",
-                isSelected = false,
-                onClick = onHomeClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.BarChart,
-                label = "Progress",
-                isSelected = false,
-                onClick = onProgressClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.Settings,
-                label = "Settings",
-                isSelected = true,
-                onClick = onSettingsClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: ImageVector,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-            modifier = Modifier.size(26.dp)
-        )
-        
-        Text(
-            text = label,
-            style = if (isSelected) {
-                MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-            } else {
-                MaterialTheme.typography.labelSmall
-            },
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-            fontSize = 10.sp
-        )
     }
 }

@@ -22,15 +22,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
 import com.drinkwater.reminder.features.home.presentation.components.WaterCupComponent
 
 /**
  * Home (Dashboard) Screen
- * 
+ *
  * Main screen showing water intake progress with WaterCupComponent
- * Follows the same pattern as SettingsScreen
+ * Navigation bar is handled at app level for consistency across all screens
  */
 @Composable
 fun HomeScreen(
@@ -39,30 +38,22 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    
-    AppScaffold(
-        topBar = {
-            HomeTopBar(
-                currentDate = state.currentDate,
-                greeting = state.greeting,
-                userName = state.userName
-            )
-        },
-        bottomBar = {
-            HomeBottomNavigation(
-                onHomeClick = { /* Already on Home */ },
-                onProgressClick = { viewModel.onEvent(HomeEvent.OnNavigateToProgress) },
-                onSettingsClick = { viewModel.onEvent(HomeEvent.OnNavigateToSettings) },
-                selectedTab = BottomNavTab.HOME
-            )
-        }
-    ) { _ ->
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        HomeTopBar(
+            currentDate = state.currentDate,
+            greeting = state.greeting,
+            userName = state.userName
+        )
+
         HomeContent(
             state = state,
             onEvent = viewModel::onEvent
         )
     }
-    
+
     // Add Water Dialog
     if (state.showAddWaterDialog) {
         AddWaterDialog(
@@ -468,98 +459,6 @@ private fun QuickAddButton(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-// ============================================================================
-// Bottom Navigation
-// ============================================================================
-
-enum class BottomNavTab {
-    HOME, PROGRESS, SETTINGS
-}
-
-@Composable
-private fun HomeBottomNavigation(
-    onHomeClick: () -> Unit,
-    onProgressClick: () -> Unit,
-    onSettingsClick: () -> Unit,
-    selectedTab: BottomNavTab
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-        tonalElevation = 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            BottomNavItem(
-                icon = Icons.Filled.Home,
-                label = "Home",
-                isSelected = selectedTab == BottomNavTab.HOME,
-                onClick = onHomeClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.BarChart,
-                label = "Progress",
-                isSelected = selectedTab == BottomNavTab.PROGRESS,
-                onClick = onProgressClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.Settings,
-                label = "Settings",
-                isSelected = selectedTab == BottomNavTab.SETTINGS,
-                onClick = onSettingsClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 24.dp, vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-            modifier = Modifier.size(26.dp)
-        )
-        
-        Text(
-            text = label,
-            style = if (isSelected) {
-                MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-            } else {
-                MaterialTheme.typography.labelSmall
-            },
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            }
-        )
     }
 }
 

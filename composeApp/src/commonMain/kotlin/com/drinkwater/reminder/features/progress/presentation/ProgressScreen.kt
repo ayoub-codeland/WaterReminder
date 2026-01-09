@@ -17,13 +17,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
 
 
 /**
  * Progress Screen - Analytics and statistics view
- * Matches the HTML reference design
+ * Navigation bar is handled at app level for consistency across all screens
  */
 @Composable
 fun ProgressScreen(
@@ -32,22 +31,15 @@ fun ProgressScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    
-    AppScaffold(
-        topBar = {
-            ProgressTopBar(onSettingsClick = { viewModel.onEvent(ProgressEvent.OnNavigateToSettings) })
-        },
-        bottomBar = {
-            ProgressBottomNavigation(
-                onHomeClick = { viewModel.onEvent(ProgressEvent.OnNavigateToHome) },
-                onProgressClick = { /* Already on Progress */ },
-                onSettingsClick = { viewModel.onEvent(ProgressEvent.OnNavigateToSettings) }
-            )
-        }
-    ) { paddingValues ->
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ProgressTopBar(onSettingsClick = { viewModel.onEvent(ProgressEvent.OnNavigateToSettings) })
+
         ProgressContent(
             state = state,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
@@ -498,94 +490,5 @@ private fun SmartTipCard(tip: String) {
                 )
             }
         }
-    }
-}
-
-// ============================================================================
-// Bottom Navigation (Reused from HomeScreen pattern)
-// ============================================================================
-
-@Composable
-private fun ProgressBottomNavigation(
-    onHomeClick: () -> Unit,
-    onProgressClick: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 24.dp)
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            BottomNavItem(
-                icon = Icons.Filled.Home,
-                label = "Home",
-                isSelected = false,
-                onClick = onHomeClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.BarChart,
-                label = "Progress",
-                isSelected = true,
-                onClick = onProgressClick
-            )
-            
-            BottomNavItem(
-                icon = Icons.Filled.Settings,
-                label = "Settings",
-                isSelected = false,
-                onClick = onSettingsClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: ImageVector,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-            modifier = Modifier.size(26.dp)
-        )
-        
-        Text(
-            text = label,
-            style = if (isSelected) {
-                MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-            } else {
-                MaterialTheme.typography.labelSmall
-            },
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-            fontSize = 10.sp
-        )
     }
 }
