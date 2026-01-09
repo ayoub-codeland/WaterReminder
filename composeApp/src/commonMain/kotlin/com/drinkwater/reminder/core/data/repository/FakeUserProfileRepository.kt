@@ -2,6 +2,7 @@ package com.drinkwater.reminder.core.data.repository
 
 import com.drinkwater.reminder.core.domain.model.*
 import com.drinkwater.reminder.core.domain.repository.UserProfileRepository
+import kotlinx.coroutines.flow.Flow
 
 class FakeUserProfileRepository : UserProfileRepository {
     
@@ -23,7 +24,11 @@ class FakeUserProfileRepository : UserProfileRepository {
     override suspend fun getProfile(): UserProfile? {
         return profile
     }
-    
+
+    override fun observeProfile(): Flow<UserProfile?> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun updateWeight(weight: Float, unit: WeightUnit) {
         profile = profile?.copy(weight = weight, weightUnit = unit)
     }
