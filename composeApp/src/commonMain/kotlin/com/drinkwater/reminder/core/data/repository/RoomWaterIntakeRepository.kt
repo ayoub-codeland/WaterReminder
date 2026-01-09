@@ -84,7 +84,10 @@ class RoomWaterIntakeRepository(
         val avgMl = dailySummaryDao.getAverageBetweenDates(weekStartDate, weekEndDate)
         val goalsReached = dailySummaryDao.countGoalsReachedBetweenDates(weekStartDate, weekEndDate)
         // Only consider days with actual water intake (totalMl > 0) for best day
-        val bestDay = dailySummaries.filter { it.totalMl > 0 }.maxByOrNull { it.totalMl }
+        // Use percentage of goal to match chart visualization (tallest bar = best day)
+        val bestDay = dailySummaries
+            .filter { it.totalMl > 0 && it.goalMl > 0 }
+            .maxByOrNull { it.totalMl.toFloat() / it.goalMl.toFloat() }
         val currentStreak = getCurrentStreak()
         
         // Calculate previous week's total for percentage change
