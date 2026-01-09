@@ -305,7 +305,7 @@ private fun WeightSlider(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterStart)
-                .pointerInput(Unit) {
+                .pointerInput(minWeight, maxWeight) {
                     detectHorizontalDragGestures { change, _ ->
                         change.consume()
                         val x = change.position.x.coerceIn(0f, size.width.toFloat())
