@@ -76,6 +76,7 @@ class SettingsViewModel(
                 repository.observeProfile().collectLatest { profile ->
                     updateState {
                         copy(
+                            userName = profile?.username ?: "",
                             weight = profile?.weight ?: 75f,
                             weightUnit = profile?.weightUnit ?: WeightUnit.KG,
                             activityLevel = profile?.activityLevel ?: ActivityLevel.MODERATE,

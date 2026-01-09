@@ -6,7 +6,7 @@ import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.presentation.UiState
 
 data class SettingsState(
-    val userName: String = "Alex Johnson",
+    val userName: String = "",
     val dailyGoal: Int = 2500,
     val weight: Float = 75f,
     val weightUnit: WeightUnit = WeightUnit.KG,

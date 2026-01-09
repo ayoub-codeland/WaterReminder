@@ -86,8 +86,11 @@ class DataStoreUserProfileRepository(
         val currentTimeMillis = System.currentTimeMillis()
 
         dataStore.edit { preferences ->
-            profile.username?.let {
-                preferences[Keys.USERNAME] = it
+            // Handle username - remove key if null, set if not null
+            if (profile.username != null) {
+                preferences[Keys.USERNAME] = profile.username
+            } else {
+                preferences.remove(Keys.USERNAME)
             }
 
             preferences[Keys.BIOLOGICAL_SEX] = profile.biologicalSex.name

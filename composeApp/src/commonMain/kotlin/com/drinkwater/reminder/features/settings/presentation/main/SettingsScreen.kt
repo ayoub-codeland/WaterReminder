@@ -311,8 +311,13 @@ private fun ProfileCard(userName: String, dailyGoal: Int, onEditClick: () -> Uni
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = userName,
-                        style = MaterialTheme.typography.titleMedium
+                        text = userName.ifBlank { "No username defined" },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (userName.isBlank()) {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
                     )
 
                     Row(
