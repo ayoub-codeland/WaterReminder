@@ -35,9 +35,9 @@ fun App() {
 
         // Determine which tab is currently active based on route
         val currentTab = when {
-            currentRoute?.startsWith("home_graph") == true -> AppNavigationTab.HOME
-            currentRoute?.startsWith("progress_graph") == true -> AppNavigationTab.PROGRESS
-            currentRoute?.startsWith("settings_graph") == true -> AppNavigationTab.SETTINGS
+            currentRoute == "home" || currentRoute?.startsWith("home_graph") == true -> AppNavigationTab.HOME
+            currentRoute == "progress" || currentRoute?.startsWith("progress_graph") == true -> AppNavigationTab.PROGRESS
+            currentRoute?.startsWith("settings") == true -> AppNavigationTab.SETTINGS
             else -> AppNavigationTab.HOME // Default fallback
         }
 
@@ -47,24 +47,33 @@ fun App() {
                 AppBottomNavigation(
                     currentTab = currentTab,
                     onNavigateToHome = {
-                        navController.navigate("home_graph") {
-                            // Clear back stack to home
-                            popUpTo("home_graph") { inclusive = true }
-                            launchSingleTop = true
+                        // Prevent navigation if already on home tab
+                        if (currentTab != AppNavigationTab.HOME) {
+                            navController.navigate("home_graph") {
+                                // Clear back stack to home
+                                popUpTo("home_graph") { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     },
                     onNavigateToProgress = {
-                        navController.navigate("progress_graph") {
-                            // Keep home in back stack
-                            popUpTo("home_graph") { inclusive = false }
-                            launchSingleTop = true
+                        // Prevent navigation if already on progress tab
+                        if (currentTab != AppNavigationTab.PROGRESS) {
+                            navController.navigate("progress_graph") {
+                                // Keep home in back stack
+                                popUpTo("home_graph") { inclusive = false }
+                                launchSingleTop = true
+                            }
                         }
                     },
                     onNavigateToSettings = {
-                        navController.navigate("settings_graph") {
-                            // Keep home in back stack
-                            popUpTo("home_graph") { inclusive = false }
-                            launchSingleTop = true
+                        // Prevent navigation if already on settings tab
+                        if (currentTab != AppNavigationTab.SETTINGS) {
+                            navController.navigate("settings_graph") {
+                                // Keep home in back stack
+                                popUpTo("home_graph") { inclusive = false }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 )
