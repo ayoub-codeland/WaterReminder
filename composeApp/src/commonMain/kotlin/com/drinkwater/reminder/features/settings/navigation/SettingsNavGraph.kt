@@ -20,6 +20,9 @@ import com.drinkwater.reminder.features.settings.presentation.profile.EditProfil
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightEffect
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightScreen
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightViewModel
+import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesScreen
+import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesSideEffect
+import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -41,6 +44,7 @@ fun NavGraphBuilder.settingsGraph(
         updateWeightScreen(navigator)
         updateActivityScreen(navigator)
         updateGoalScreen(navigator)
+        notificationPreferencesScreen(navigator)
     }
 }
 
@@ -63,7 +67,7 @@ private fun NavGraphBuilder.settingsMainScreen(
                 SettingsEffect.NavigateToWeightSettings -> navigator.navigateToUpdateWeight()
                 SettingsEffect.NavigateToActivitySettings -> navigator.navigateToUpdateActivity()
                 SettingsEffect.NavigateToGoalSettings -> navigator.navigateToUpdateGoal()
-                SettingsEffect.NavigateToNotifications -> {}
+                SettingsEffect.NavigateToNotifications -> navigator.navigateToNotifications()
                 SettingsEffect.NavigateToStartOfWeek -> {}
                 is SettingsEffect.OpenUrl -> navigator.openUrl(effect.url)
             }
@@ -147,6 +151,32 @@ private fun NavGraphBuilder.updateGoalScreen(
             when (effect) {
                 UpdateDailyGoalEffect.NavigateBack -> navigator.navigateBack()
                 is UpdateDailyGoalEffect.ShowError -> {}
+            }
+        }
+    }
+}
+
+private fun NavGraphBuilder.notificationPreferencesScreen(
+    navigator: SettingsNavigator
+) {
+    composable(SettingsDestination.Notifications.route) {
+        // Inject ViewModel via Koin
+        val viewModel = koinViewModel<NotificationPreferencesViewModel>()
+
+        NotificationPreferencesScreen(viewModel = viewModel)
+
+        HandleEffects(viewModel.effect) { effect ->
+            when (effect) {
+                NotificationPreferencesSideEffect.NavigateBack -> navigator.navigateBack()
+                is NotificationPreferencesSideEffect.ShowError -> {
+                    // TODO: Show error toast/snackbar
+                }
+                is NotificationPreferencesSideEffect.ShowFrequencyPicker -> {
+                    // TODO: Show frequency picker dialog
+                }
+                is NotificationPreferencesSideEffect.ShowTimePicker -> {
+                    // TODO: Show time picker dialog
+                }
             }
         }
     }

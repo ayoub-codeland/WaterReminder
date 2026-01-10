@@ -44,6 +44,12 @@ class SettingsNavigator(private val navController: NavController) {
         }
     }
 
+    fun navigateToNotifications() {
+        navController.navigate(SettingsDestination.Notifications.route) {
+            launchSingleTop = true
+        }
+    }
+
     fun navigateBack() {
         // Safely handle back navigation - prevent blank screens
         if (!navController.popBackStack()) {
