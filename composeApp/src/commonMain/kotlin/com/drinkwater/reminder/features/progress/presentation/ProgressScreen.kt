@@ -1,6 +1,7 @@
 package com.drinkwater.reminder.features.progress.presentation
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,13 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
+import kotlin.math.roundToInt
 
 
 /**
@@ -226,6 +227,8 @@ private fun WeeklySummarySection(
 
 @Composable
 private fun WeeklyChart(chartData: List<DayChartData>) {
+    var selectedDay by remember { mutableStateOf<DayChartData?>(null) }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -234,48 +237,40 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp)
-                .padding(20.dp)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Goal line
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = 40.dp) // Approximately 70% from bottom
-            ) {
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 2.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                // Goal label
-                Text(
-                    text = "GOAL",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .offset(y = (-12).dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(horizontal = 4.dp)
+            // Selected day details (shown when user taps a bar)
+            selectedDay?.let { day ->
+                DayDetailsCard(
+                    dayData = day,
+                    onDismiss = { selectedDay = null }
                 )
             }
 
-            // Bars
+            // Bars with individual goal markers
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .height(180.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Bottom
             ) {
                 chartData.forEach { dayData ->
-                    DayBar(data = dayData)
+                    DayBar(
+                        data = dayData,
+                        isSelected = selectedDay?.dayLabel == dayData.dayLabel,
+                        onClick = {
+                            selectedDay = if (selectedDay?.dayLabel == dayData.dayLabel) {
+                                null // Deselect if already selected
+                            } else {
+                                dayData
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -283,13 +278,154 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
 }
 
 @Composable
-private fun DayBar(data: DayChartData) {
+private fun DayDetailsCard(
+    dayData: DayChartData,
+    onDismiss: () -> Unit
+) {
+    val liters = dayData.totalMl / 1000f
+    val goalLiters = dayData.goalMl / 1000f
+    val percentage = if (dayData.goalMl > 0) {
+        ((dayData.totalMl.toFloat() / dayData.goalMl.toFloat()) * 100).roundToInt()
+    } else 0
+
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Day info
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = dayData.dayName,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (dayData.isToday) {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        ) {
+                            Text(
+                                text = "Today",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    // Water consumed
+                    Column {
+                        Text(
+                            text = "Consumed",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = formatLiters(liters),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Goal
+                    Column {
+                        Text(
+                            text = "Goal",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = formatLiters(goalLiters),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Percentage
+                    Column {
+                        Text(
+                            text = "Achievement",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "$percentage%",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = when {
+                                percentage >= 100 -> Color(0xFF16A34A)
+                                percentage >= 70 -> MaterialTheme.colorScheme.primary
+                                else -> MaterialTheme.colorScheme.onSurface
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Close button
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
+
+private fun formatLiters(liters: Float): String {
+    return if (liters >= 10) {
+        "${liters.toInt()}L"
+    } else {
+        val rounded = (liters * 10).roundToInt() / 10f
+        val intPart = rounded.toInt()
+        val decPart = ((rounded - intPart) * 10).roundToInt()
+        if (decPart == 0) "${intPart}L" else "$intPart.${decPart}L"
+    }
+}
+
+@Composable
+private fun DayBar(
+    data: DayChartData,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {}
+) {
     val maxHeight = 160.dp
     val barHeight = (maxHeight.value * data.progress.coerceAtMost(1f)).dp
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.clickable(
+            enabled = !data.isFuture,
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() }
+        ) { onClick() }
     ) {
         Box(
             modifier = Modifier
@@ -297,6 +433,20 @@ private fun DayBar(data: DayChartData) {
                 .height(maxHeight),
             contentAlignment = Alignment.BottomCenter
         ) {
+            // Goal marker line (at 100% position from bottom)
+            if (!data.isFuture && data.goalMl > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .offset(y = (-maxHeight))  // Position at 100% (maxHeight from bottom)
+                        .background(
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                        )
+                )
+            }
+
             // Bar background
             Box(
                 modifier = Modifier
@@ -306,19 +456,20 @@ private fun DayBar(data: DayChartData) {
                     .background(
                         when {
                             data.isFuture -> MaterialTheme.colorScheme.surfaceVariant
+                            isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
                             data.progress < 0.3f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                             data.goalReached -> MaterialTheme.colorScheme.primary
                             else -> MaterialTheme.colorScheme.primary
                         }
                     )
             ) {
-                // Highlight on top for high bars
-                if (data.progress >= 0.7f && !data.isFuture) {
+                // Highlight on top for high bars or selected
+                if ((data.progress >= 0.7f || isSelected) && !data.isFuture) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(4.dp)
-                            .background(Color.White.copy(alpha = 0.3f))
+                            .background(Color.White.copy(alpha = if (isSelected) 0.5f else 0.3f))
                     )
                 }
             }
@@ -328,8 +479,9 @@ private fun DayBar(data: DayChartData) {
         Text(
             text = data.dayLabel,
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = if (data.isToday) FontWeight.Bold else FontWeight.Medium,
+            fontWeight = if (data.isToday || isSelected) FontWeight.Bold else FontWeight.Medium,
             color = when {
+                isSelected -> MaterialTheme.colorScheme.primary
                 data.isToday -> MaterialTheme.colorScheme.primary
                 data.isFuture -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                 else -> MaterialTheme.colorScheme.onSurfaceVariant

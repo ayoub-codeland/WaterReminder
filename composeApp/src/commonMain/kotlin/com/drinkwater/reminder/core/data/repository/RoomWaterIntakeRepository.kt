@@ -83,11 +83,12 @@ class RoomWaterIntakeRepository(
         val totalMl = dailySummaryDao.getTotalBetweenDates(weekStartDate, weekEndDate)
         val avgMl = dailySummaryDao.getAverageBetweenDates(weekStartDate, weekEndDate)
         val goalsReached = dailySummaryDao.countGoalsReachedBetweenDates(weekStartDate, weekEndDate)
-        // Only consider days with actual water intake (totalMl > 0) for best day
-        // Use percentage of goal to match chart visualization (tallest bar = best day)
+        // Best day = day with highest absolute water intake (ml)
+        // This reflects actual hydration, which is what matters for health
+        // Chart shows percentage of goal, but "best day" is about drinking the most water
         val bestDay = dailySummaries
-            .filter { it.totalMl > 0 && it.goalMl > 0 }
-            .maxByOrNull { it.totalMl.toFloat() / it.goalMl.toFloat() }
+            .filter { it.totalMl > 0 }
+            .maxByOrNull { it.totalMl }
         val currentStreak = getCurrentStreak()
         
         // Calculate previous week's total for percentage change
