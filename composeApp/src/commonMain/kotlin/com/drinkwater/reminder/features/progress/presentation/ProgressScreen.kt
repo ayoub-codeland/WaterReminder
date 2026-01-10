@@ -229,6 +229,13 @@ private fun WeeklySummarySection(
 private fun WeeklyChart(chartData: List<DayChartData>) {
     var selectedDay by remember { mutableStateOf<DayChartData?>(null) }
 
+    // Calculate max water intake in the week for scaling bars
+    // Use max of actual data OR typical daily goal (2500ml) to ensure reasonable scaling
+    val maxMlInWeek = chartData
+        .filter { !it.isFuture }
+        .maxOfOrNull { it.totalMl }
+        ?.coerceAtLeast(2500) ?: 2500
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,7 +258,7 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
                 )
             }
 
-            // Bars with individual goal markers
+            // Bars representing absolute water intake
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -269,7 +276,8 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
                             } else {
                                 dayData
                             }
-                        }
+                        },
+                        maxMlInWeek = maxMlInWeek
                     )
                 }
             }
@@ -413,10 +421,17 @@ private fun formatLiters(liters: Float): String {
 private fun DayBar(
     data: DayChartData,
     isSelected: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    maxMlInWeek: Int = 3000 // Will be passed from parent
 ) {
     val maxHeight = 160.dp
-    val barHeight = (maxHeight.value * data.progress.coerceAtMost(1f)).dp
+    // Calculate bar height based on absolute water intake, not percentage of goal
+    // This ensures taller bars = more water consumed (matches user intuition)
+    val barHeight = if (maxMlInWeek > 0) {
+        (maxHeight.value * (data.totalMl.toFloat() / maxMlInWeek.toFloat())).dp.coerceAtMost(maxHeight)
+    } else {
+        0.dp
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -433,20 +448,6 @@ private fun DayBar(
                 .height(maxHeight),
             contentAlignment = Alignment.BottomCenter
         ) {
-            // Goal marker line (at 100% position from bottom)
-            if (!data.isFuture && data.goalMl > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .offset(y = (-maxHeight))  // Position at 100% (maxHeight from bottom)
-                        .background(
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                        )
-                )
-            }
-
             // Bar background
             Box(
                 modifier = Modifier
