@@ -45,11 +45,13 @@ data class DayChartData(
     val totalMl: Int,
     val goalMl: Int,
     val isToday: Boolean = false,
-    val isFuture: Boolean = false
+    val isFuture: Boolean = false,
+    val isBestDay: Boolean = false,  // Highest water intake in week
+    val isWorstDay: Boolean = false  // Lowest water intake in week (for context)
 ) {
     val progress: Float
         get() = if (goalMl > 0) (totalMl.toFloat() / goalMl.toFloat()).coerceIn(0f, 1.2f) else 0f
-    
+
     val goalReached: Boolean
         get() = totalMl >= goalMl
 }

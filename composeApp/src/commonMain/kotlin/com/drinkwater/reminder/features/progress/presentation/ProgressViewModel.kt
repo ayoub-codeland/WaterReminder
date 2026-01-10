@@ -84,27 +84,43 @@ class ProgressViewModel(
         val now = Clock.System.now()
         val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
         val todayStr = formatDate(today)
-        
+
         val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
         val dayNames = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-        
+
         // Parse week start date
         val parts = weekStartDate.split("-")
         val startDate = LocalDate(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
-        
-        return dayLabels.mapIndexed { index, label ->
+
+        // Build initial chart data
+        val chartData = dayLabels.mapIndexed { index, label ->
             val date = LocalDate.fromEpochDays(startDate.toEpochDays() + index)
             val dateStr = formatDate(date)
             val summary = summaries.find { it.date == dateStr }
             val isFuture = date.toEpochDays() > today.toEpochDays()
-            
+
             DayChartData(
                 dayLabel = label,
                 dayName = dayNames[index],
                 totalMl = summary?.totalMl ?: 0,
                 goalMl = summary?.goalMl ?: 2500,
                 isToday = dateStr == todayStr,
-                isFuture = isFuture
+                isFuture = isFuture,
+                isBestDay = false,  // Will be set below
+                isWorstDay = false  // Will be set below
+            )
+        }
+
+        // Business logic: Identify best and worst days (only non-future days with water intake)
+        val daysWithWater = chartData.filter { !it.isFuture && it.totalMl > 0 }
+        val bestDayTotalMl = daysWithWater.maxOfOrNull { it.totalMl }
+        val worstDayTotalMl = daysWithWater.minOfOrNull { it.totalMl }
+
+        // Mark best/worst days in data
+        return chartData.map { day ->
+            day.copy(
+                isBestDay = !day.isFuture && day.totalMl > 0 && day.totalMl == bestDayTotalMl,
+                isWorstDay = !day.isFuture && day.totalMl > 0 && day.totalMl == worstDayTotalMl && bestDayTotalMl != worstDayTotalMl
             )
         }
     }

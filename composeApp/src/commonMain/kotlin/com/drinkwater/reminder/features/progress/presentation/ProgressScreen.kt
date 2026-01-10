@@ -236,10 +236,6 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
         .maxOfOrNull { it.totalMl }
         ?.coerceAtLeast(2500) ?: 2500
 
-    // Identify best and worst days for contextual badges
-    val bestDayData = chartData.filter { !it.isFuture && it.totalMl > 0 }.maxByOrNull { it.totalMl }
-    val worstDayData = chartData.filter { !it.isFuture && it.totalMl > 0 }.minByOrNull { it.totalMl }
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,8 +254,6 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
             selectedDay?.let { day ->
                 DayDetailsCard(
                     dayData = day,
-                    isBestDay = day.dayLabel == bestDayData?.dayLabel && day.totalMl == bestDayData?.totalMl,
-                    isWorstDay = day.dayLabel == worstDayData?.dayLabel && day.totalMl == worstDayData?.totalMl && bestDayData != worstDayData,
                     onDismiss = { selectedDay = null }
                 )
             }
@@ -294,8 +288,6 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
 @Composable
 private fun DayDetailsCard(
     dayData: DayChartData,
-    isBestDay: Boolean = false,
-    isWorstDay: Boolean = false,
     onDismiss: () -> Unit
 ) {
     val liters = dayData.totalMl / 1000f
@@ -329,7 +321,7 @@ private fun DayDetailsCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Context badges
+                    // Context badges (data comes from State via ViewModel)
                     if (dayData.isToday) {
                         ContextBadge(
                             text = "Today",
@@ -338,7 +330,7 @@ private fun DayDetailsCard(
                         )
                     }
 
-                    if (isBestDay) {
+                    if (dayData.isBestDay) {
                         ContextBadge(
                             text = "Best Day",
                             backgroundColor = Color(0xFFDCFCE7),
@@ -346,7 +338,7 @@ private fun DayDetailsCard(
                         )
                     }
 
-                    if (isWorstDay) {
+                    if (dayData.isWorstDay) {
                         ContextBadge(
                             text = "Needs Work",
                             backgroundColor = Color(0xFFFEF3C7),
@@ -354,13 +346,13 @@ private fun DayDetailsCard(
                         )
                     }
 
-                    if (percentage >= 100 && !isBestDay && !dayData.isToday) {
+                    if (percentage >= 100 && !dayData.isBestDay && !dayData.isToday) {
                         ContextBadge(
                             text = "Goal Met",
                             backgroundColor = Color(0xFFDCFCE7),
                             textColor = Color(0xFF16A34A)
                         )
-                    } else if (percentage < 50 && !isWorstDay && dayData.totalMl > 0) {
+                    } else if (percentage < 50 && !dayData.isWorstDay && dayData.totalMl > 0) {
                         ContextBadge(
                             text = "Low",
                             backgroundColor = Color(0xFFFEE2E2),
