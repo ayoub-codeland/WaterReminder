@@ -236,6 +236,10 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
         .maxOfOrNull { it.totalMl }
         ?.coerceAtLeast(2500) ?: 2500
 
+    // Identify best and worst days for contextual badges
+    val bestDayData = chartData.filter { !it.isFuture && it.totalMl > 0 }.maxByOrNull { it.totalMl }
+    val worstDayData = chartData.filter { !it.isFuture && it.totalMl > 0 }.minByOrNull { it.totalMl }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,6 +258,8 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
             selectedDay?.let { day ->
                 DayDetailsCard(
                     dayData = day,
+                    isBestDay = day.dayLabel == bestDayData?.dayLabel && day.totalMl == bestDayData?.totalMl,
+                    isWorstDay = day.dayLabel == worstDayData?.dayLabel && day.totalMl == worstDayData?.totalMl && bestDayData != worstDayData,
                     onDismiss = { selectedDay = null }
                 )
             }
@@ -288,6 +294,8 @@ private fun WeeklyChart(chartData: List<DayChartData>) {
 @Composable
 private fun DayDetailsCard(
     dayData: DayChartData,
+    isBestDay: Boolean = false,
+    isWorstDay: Boolean = false,
     onDismiss: () -> Unit
 ) {
     val liters = dayData.totalMl / 1000f
@@ -320,18 +328,44 @@ private fun DayDetailsCard(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+
+                    // Context badges
                     if (dayData.isToday) {
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        ) {
-                            Text(
-                                text = "Today",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
+                        ContextBadge(
+                            text = "Today",
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            textColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    if (isBestDay) {
+                        ContextBadge(
+                            text = "Best Day",
+                            backgroundColor = Color(0xFFDCFCE7),
+                            textColor = Color(0xFF16A34A)
+                        )
+                    }
+
+                    if (isWorstDay) {
+                        ContextBadge(
+                            text = "Needs Work",
+                            backgroundColor = Color(0xFFFEF3C7),
+                            textColor = Color(0xFFD97706)
+                        )
+                    }
+
+                    if (percentage >= 100 && !isBestDay && !dayData.isToday) {
+                        ContextBadge(
+                            text = "Goal Met",
+                            backgroundColor = Color(0xFFDCFCE7),
+                            textColor = Color(0xFF16A34A)
+                        )
+                    } else if (percentage < 50 && !isWorstDay && dayData.totalMl > 0) {
+                        ContextBadge(
+                            text = "Low",
+                            backgroundColor = Color(0xFFFEE2E2),
+                            textColor = Color(0xFFDC2626)
+                        )
                     }
                 }
 
@@ -403,6 +437,26 @@ private fun DayDetailsCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ContextBadge(
+    text: String,
+    backgroundColor: Color,
+    textColor: Color
+) {
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        color = backgroundColor
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = textColor,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
     }
 }
 
