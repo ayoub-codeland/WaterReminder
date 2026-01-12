@@ -69,6 +69,16 @@ class NotificationPreferencesViewModel(
                 )
             }
 
+            is NotificationPreferencesEvent.OnWakeUpTimeSelected -> {
+                updateState { copy(wakeUpTime = event.time) }
+                savePreferences()
+            }
+
+            is NotificationPreferencesEvent.OnBedtimeSelected -> {
+                updateState { copy(bedtime = event.time) }
+                savePreferences()
+            }
+
             is NotificationPreferencesEvent.OnTogglePauseWhenGoalReached -> {
                 updateState { copy(pauseWhenGoalReached = event.enabled) }
                 savePreferences()

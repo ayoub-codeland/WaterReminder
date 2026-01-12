@@ -10,6 +10,8 @@ sealed interface NotificationPreferencesEvent : UiEvent {
     data class OnToggleNotifications(val enabled: Boolean) : NotificationPreferencesEvent
     data object OnFrequencyClick : NotificationPreferencesEvent
     data object OnWakeUpTimeClick : NotificationPreferencesEvent
+    data class OnWakeUpTimeSelected(val time: String) : NotificationPreferencesEvent
     data object OnBedtimeClick : NotificationPreferencesEvent
+    data class OnBedtimeSelected(val time: String) : NotificationPreferencesEvent
     data class OnTogglePauseWhenGoalReached(val enabled: Boolean) : NotificationPreferencesEvent
 }

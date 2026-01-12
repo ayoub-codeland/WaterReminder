@@ -13,9 +13,7 @@ import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +46,22 @@ private fun NotificationPreferencesScreenContent(
     state: NotificationPreferencesState,
     onEvent: (NotificationPreferencesEvent) -> Unit
 ) {
+    var showWakeUpTimePicker by remember { mutableStateOf(false) }
+    var showBedtimePicker by remember { mutableStateOf(false) }
+    var requestPermission by remember { mutableStateOf(false) }
+
+    // Handle notification permission request when user enables notifications
+    RequestNotificationPermissionIfNeeded(
+        shouldRequest = requestPermission,
+        onPermissionResult = { granted ->
+            requestPermission = false
+            if (!granted) {
+                // Permission denied, turn off notifications
+                onEvent(NotificationPreferencesEvent.OnToggleNotifications(false))
+            }
+        }
+    )
+
     AppScaffold(
         topBar = {
             TopAppBar(
@@ -83,7 +97,13 @@ private fun NotificationPreferencesScreenContent(
                 // Enable Hydration Reminders Toggle
                 EnableNotificationsCard(
                     isEnabled = state.isEnabled,
-                    onToggle = { onEvent(NotificationPreferencesEvent.OnToggleNotifications(it)) }
+                    onToggle = { enabled ->
+                        if (enabled) {
+                            // Request permission before enabling
+                            requestPermission = true
+                        }
+                        onEvent(NotificationPreferencesEvent.OnToggleNotifications(enabled))
+                    }
                 )
 
                 // Schedule Section
@@ -92,8 +112,8 @@ private fun NotificationPreferencesScreenContent(
                     wakeUpTime = state.wakeUpTime,
                     bedtime = state.bedtime,
                     onFrequencyClick = { onEvent(NotificationPreferencesEvent.OnFrequencyClick) },
-                    onWakeUpTimeClick = { onEvent(NotificationPreferencesEvent.OnWakeUpTimeClick) },
-                    onBedtimeClick = { onEvent(NotificationPreferencesEvent.OnBedtimeClick) }
+                    onWakeUpTimeClick = { showWakeUpTimePicker = true },
+                    onBedtimeClick = { showBedtimePicker = true }
                 )
 
                 // Smart Options Section
@@ -104,6 +124,129 @@ private fun NotificationPreferencesScreenContent(
             }
         }
     )
+
+    // Wake Up Time Picker Dialog
+    if (showWakeUpTimePicker) {
+        TimePickerDialog(
+            title = "Wake Up Time",
+            currentTime = state.wakeUpTime,
+            onDismiss = { showWakeUpTimePicker = false },
+            onConfirm = { selectedTime ->
+                onEvent(NotificationPreferencesEvent.OnWakeUpTimeSelected(selectedTime))
+                showWakeUpTimePicker = false
+            }
+        )
+    }
+
+    // Bedtime Picker Dialog
+    if (showBedtimePicker) {
+        TimePickerDialog(
+            title = "Bedtime",
+            currentTime = state.bedtime,
+            onDismiss = { showBedtimePicker = false },
+            onConfirm = { selectedTime ->
+                onEvent(NotificationPreferencesEvent.OnBedtimeSelected(selectedTime))
+                showBedtimePicker = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimePickerDialog(
+    title: String,
+    currentTime: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    // Parse current time from "HH:MM AM/PM" format
+    val (initialHour, initialMinute) = parseTime12Hour(currentTime)
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        is24Hour = false
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        text = {
+            TimePicker(
+                state = timePickerState,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val selectedTime = formatTime12Hour(
+                        timePickerState.hour,
+                        timePickerState.minute
+                    )
+                    onConfirm(selectedTime)
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+/**
+ * Parse time from "HH:MM AM/PM" format to 24-hour (hour, minute)
+ */
+private fun parseTime12Hour(time: String): Pair<Int, Int> {
+    return try {
+        val parts = time.split(" ")
+        if (parts.size != 2) return Pair(7, 0)
+
+        val timeParts = parts[0].split(":")
+        if (timeParts.size != 2) return Pair(7, 0)
+
+        var hour = timeParts[0].toIntOrNull() ?: 7
+        val minute = timeParts[1].toIntOrNull() ?: 0
+        val amPm = parts[1]
+
+        // Convert to 24-hour format
+        hour = when {
+            amPm == "AM" && hour == 12 -> 0
+            amPm == "AM" -> hour
+            amPm == "PM" && hour == 12 -> 12
+            amPm == "PM" -> hour + 12
+            else -> hour
+        }
+
+        Pair(hour, minute)
+    } catch (e: Exception) {
+        Pair(7, 0)
+    }
+}
+
+/**
+ * Format time to "HH:MM AM/PM" format from 24-hour (hour, minute)
+ */
+private fun formatTime12Hour(hour24: Int, minute: Int): String {
+    val (hour12, amPm) = when {
+        hour24 == 0 -> Pair(12, "AM")
+        hour24 < 12 -> Pair(hour24, "AM")
+        hour24 == 12 -> Pair(12, "PM")
+        else -> Pair(hour24 - 12, "PM")
+    }
+
+    return "${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} $amPm"
 }
 
 @Composable
