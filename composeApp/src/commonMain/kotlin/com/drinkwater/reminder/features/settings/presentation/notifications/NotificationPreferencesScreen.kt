@@ -50,20 +50,24 @@ private fun NotificationPreferencesScreenContent(
     var showBedtimePicker by remember { mutableStateOf(false) }
     var requestPermission by remember { mutableStateOf(false) }
 
-    // Check permission on screen load if notifications are enabled
-    LaunchedEffect(state.isEnabled) {
-        if (state.isEnabled && !state.isLoading) {
-            requestPermission = true
+    // Check actual system permission status
+    val hasSystemPermission = CheckNotificationPermission()
+
+    // Sync: If toggle is ON but permission is denied, turn it OFF
+    LaunchedEffect(hasSystemPermission, state.isEnabled) {
+        if (state.isEnabled && !hasSystemPermission && !state.isLoading) {
+            // Permission was revoked from system settings, sync state
+            onEvent(NotificationPreferencesEvent.OnToggleNotifications(false))
         }
     }
 
-    // Handle notification permission request when user enables notifications
+    // Handle notification permission request
     RequestNotificationPermissionIfNeeded(
         shouldRequest = requestPermission,
         onPermissionResult = { granted ->
             requestPermission = false
             if (!granted) {
-                // Permission denied, turn off notifications
+                // Permission denied, ensure toggle is OFF
                 onEvent(NotificationPreferencesEvent.OnToggleNotifications(false))
             }
         }

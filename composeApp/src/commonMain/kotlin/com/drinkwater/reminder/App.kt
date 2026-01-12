@@ -1,8 +1,7 @@
 package com.drinkwater.reminder
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -14,6 +13,7 @@ import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.features.home.navigation.homeGraph
 import com.drinkwater.reminder.features.progress.navigation.progressGraph
 import com.drinkwater.reminder.features.settings.navigation.settingsGraph
+import com.drinkwater.reminder.features.settings.presentation.notifications.RequestNotificationPermissionIfNeeded
 
 /**
  * Main App Composable
@@ -28,6 +28,15 @@ import com.drinkwater.reminder.features.settings.navigation.settingsGraph
 fun App() {
     AppTheme {
         val navController = rememberNavController()
+
+        // Request notification permission on first app launch
+        var requestInitialPermission by remember { mutableStateOf(true) }
+        RequestNotificationPermissionIfNeeded(
+            shouldRequest = requestInitialPermission,
+            onPermissionResult = { _ ->
+                requestInitialPermission = false
+            }
+        )
 
         // Observe current navigation state
         val navBackStackEntry by navController.currentBackStackEntryAsState()
