@@ -550,7 +550,13 @@ private fun AddWaterDialog(
                     ) {
                         BasicTextField(
                             value = customAmount,
-                            onValueChange = onCustomAmountChanged,
+                            onValueChange = { newValue ->
+                                // Limit to 3000ml maximum (scientific safety limit)
+                                val amount = newValue.toIntOrNull()
+                                if (amount == null || amount <= 3000) {
+                                    onCustomAmountChanged(newValue)
+                                }
+                            },
                             textStyle = MaterialTheme.typography.displaySmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -583,7 +589,7 @@ private fun AddWaterDialog(
                         Text(
                             text = "ml",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
@@ -600,7 +606,8 @@ private fun AddWaterDialog(
                         IconButton(
                             onClick = {
                                 val current = customAmount.toIntOrNull() ?: 0
-                                onCustomAmountChanged((current + 50).toString())
+                                val newAmount = (current + 50).coerceAtMost(3000)
+                                onCustomAmountChanged(newAmount.toString())
                             }
                         ) {
                             Icon(
