@@ -194,7 +194,7 @@ private fun VolumeUnitToggle(
             ) {
                 Text(
                     text = "oz",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelMedium,
                     color = if (selectedUnit == VolumeUnit.OZ)
                         MaterialTheme.colorScheme.onPrimary
                     else
@@ -233,7 +233,7 @@ private fun SettingsItem(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(iconBackgroundColor),
                 contentAlignment = Alignment.Center
             ) {

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,22 +60,39 @@ private fun UpdateActivityLevelScreenContent(
 ) {
     AppScaffold(
         topBar = {
-            Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.background) {
-                Box(Modifier.fillMaxWidth().padding(16.dp)) {
-                    IconButton(
-                        onClick = { onEvent(UpdateActivityLevelEvent.OnBackClick) },
-                        modifier = Modifier.align(Alignment.CenterStart)
+            Column {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        Icon(Icons.Default.ArrowBack, "Back")
-                    }
+                        IconButton(
+                            onClick = { onEvent(UpdateActivityLevelEvent.OnBackClick) },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
 
-                    Text(
-                        "Update Activity Level",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                        Text(
+                            text = "Update Activity Level",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
             }
         }
     ) { _ ->
@@ -82,7 +100,7 @@ private fun UpdateActivityLevelScreenContent(
             Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+                .padding(horizontal = 16.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.weight(0.5f))
@@ -217,7 +235,7 @@ private fun UpdateActivityLevelScreenContent(
                 Button(
                     onClick = { onEvent(UpdateActivityLevelEvent.OnSaveClick) },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     enabled = !state.isSaving
                 ) {
                     if (state.isSaving) {
