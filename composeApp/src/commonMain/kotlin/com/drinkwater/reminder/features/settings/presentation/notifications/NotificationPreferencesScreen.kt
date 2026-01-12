@@ -50,6 +50,13 @@ private fun NotificationPreferencesScreenContent(
     var showBedtimePicker by remember { mutableStateOf(false) }
     var requestPermission by remember { mutableStateOf(false) }
 
+    // Check permission on screen load if notifications are enabled
+    LaunchedEffect(state.isEnabled) {
+        if (state.isEnabled && !state.isLoading) {
+            requestPermission = true
+        }
+    }
+
     // Handle notification permission request when user enables notifications
     RequestNotificationPermissionIfNeeded(
         shouldRequest = requestPermission,
