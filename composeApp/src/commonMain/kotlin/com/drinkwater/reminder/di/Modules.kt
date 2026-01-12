@@ -4,15 +4,20 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.drinkwater.reminder.core.data.database.DatabaseFactory
 import com.drinkwater.reminder.core.data.database.WaterReminderDatabase
 import com.drinkwater.reminder.core.data.datastore.DataStoreFactory
+import com.drinkwater.reminder.core.data.repository.DataStoreNotificationRepository
 import com.drinkwater.reminder.core.data.repository.DataStoreUserProfileRepository
 import com.drinkwater.reminder.core.data.repository.InMemoryDailyTipRepository
 import com.drinkwater.reminder.core.data.repository.RoomWaterIntakeRepository
 import com.drinkwater.reminder.core.domain.repository.DailyTipRepository
+import com.drinkwater.reminder.core.domain.repository.NotificationRepository
 import com.drinkwater.reminder.core.domain.repository.UserProfileRepository
 import com.drinkwater.reminder.core.domain.repository.WaterIntakeRepository
 import com.drinkwater.reminder.core.domain.usecase.CalculateDailyGoalUseCase
 import com.drinkwater.reminder.core.domain.usecase.GetDailyTipUseCase
 import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
+import com.drinkwater.reminder.core.domain.usecase.notification.GetNotificationPreferencesUseCase
+import com.drinkwater.reminder.core.domain.usecase.notification.ObserveNotificationPreferencesUseCase
+import com.drinkwater.reminder.core.domain.usecase.notification.SaveNotificationPreferencesUseCase
 import com.drinkwater.reminder.features.home.domain.usecase.AddWaterIntakeUseCase
 import com.drinkwater.reminder.features.home.domain.usecase.GetCurrentStreakUseCase
 import com.drinkwater.reminder.features.home.domain.usecase.GetTodayIntakeUseCase
@@ -27,6 +32,7 @@ import com.drinkwater.reminder.features.settings.domain.usecase.UpdateWeightUseC
 import com.drinkwater.reminder.features.settings.presentation.activity.UpdateActivityLevelViewModel
 import com.drinkwater.reminder.features.settings.presentation.goal.UpdateDailyGoalViewModel
 import com.drinkwater.reminder.features.settings.presentation.main.SettingsViewModel
+import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesViewModel
 import com.drinkwater.reminder.features.settings.presentation.profile.EditProfileViewModel
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightViewModel
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +66,7 @@ val dataModule = module {
     singleOf(::DataStoreUserProfileRepository).bind<UserProfileRepository>()
     singleOf(::RoomWaterIntakeRepository).bind<WaterIntakeRepository>()
     singleOf(::InMemoryDailyTipRepository).bind<DailyTipRepository>()
+    singleOf(::DataStoreNotificationRepository).bind<NotificationRepository>()
 }
 
 val domainModule = module {
@@ -80,6 +87,11 @@ val domainModule = module {
     // Progress use cases
     factory { GetWeeklyStatsUseCase(get()) }
     factory { GetAllTimeStatsUseCase(get()) }
+
+    // Notification use cases
+    factory { GetNotificationPreferencesUseCase(get()) }
+    factory { SaveNotificationPreferencesUseCase(get()) }
+    factory { ObserveNotificationPreferencesUseCase(get()) }
 }
 
 val viewModelModule = module {
@@ -95,6 +107,7 @@ val viewModelModule = module {
     viewModel { UpdateWeightViewModel(get(), get()) }
     viewModel { UpdateActivityLevelViewModel(get(), get()) }
     viewModel { UpdateDailyGoalViewModel(get(), get(), get()) }
+    viewModel { NotificationPreferencesViewModel(get(), get(), get()) }
 }
 
 fun appModules() = listOf(

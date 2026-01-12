@@ -5,7 +5,11 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nrefactor\\(navigation\\): centralize bottom navigation at app level\n\nImplement Clean Architecture pattern by moving navigation bar to app-level\nas single source of truth. This eliminates duplication and improves\nmaintainability.\n\n**Changes:**\n- Move AppBottomNavigation to App.kt \\(centralized\\)\n- Remove duplicate navigation bars from Home, Progress, Settings screens\n- Simplify screen composables to only render content\n- Update navigators with proper back stack management\n- Fix Settings screen navigation \\(was broken with empty callbacks\\)\n\n**Benefits:**\n- Single source of truth for navigation state\n- No recreation of nav bar on screen transitions\n- Decoupled features \\(SOLID principles\\)\n- Smoother animations and better performance\n- Scalable for adding new features\n\n**Architecture:**\n- App level: Handles cross-feature navigation and persistent UI\n- Feature level: Handles feature-specific content only\n- Follows Clean Architecture dependency rule\n\nFixes navigation consistency issues across all three main screens.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(grep:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(Select-Object -First 50)",
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(./gradlew :composeApp:compileDebugKotlinAndroid:*)"
     ]
   }
 }
