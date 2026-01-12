@@ -479,13 +479,6 @@ private fun AddWaterDialog(
     onDismiss: () -> Unit,
     onReset: () -> Unit
 ) {
-    val presets = listOf(
-        100 to "Sip",
-        250 to "Glass",
-        500 to "Bottle",
-        750 to "Large"
-    )
-    
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -500,58 +493,45 @@ private fun AddWaterDialog(
             ) {
                 // Title
                 Text(
-                    text = "💧 Add Water",
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "Add Water",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
-                // Current progress
+
+                // Subtitle
                 Text(
-                    text = "${formatAmount(currentIntake)} / ${formatAmount(dailyGoal)} ml",
+                    text = "Enter amount in milliliters",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
-                Spacer(modifier = Modifier.height(20.dp))
-                
-                // Preset chips
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    presets.forEach { (amount, label) ->
-                        PresetChip(
-                            amount = amount,
-                            label = label,
-                            onClick = { onAddPreset(amount) },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(18.dp))
-                
-                // Custom input
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Amount input
                 OutlinedTextField(
                     value = customAmount,
                     onValueChange = onCustomAmountChanged,
-                    label = { Text("Custom amount (ml)") },
+                    placeholder = { Text("300") },
+                    suffix = { Text("ml", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     isError = customAmountError != null,
                     supportingText = customAmountError?.let { { Text(it) } },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
+                    textStyle = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
                     )
                 )
-                
-                Spacer(modifier = Modifier.height(22.dp))
-                
+
+                Spacer(modifier = Modifier.height(24.dp))
+
                 // Action buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -562,9 +542,9 @@ private fun AddWaterDialog(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Cancel")
                     }
-                    
+
                     Button(
                         onClick = onConfirmCustom,
                         enabled = customAmount.isNotBlank(),
@@ -574,53 +554,10 @@ private fun AddWaterDialog(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
-                        Text("Add", fontWeight = FontWeight.SemiBold)
+                        Text("Add Water", fontWeight = FontWeight.SemiBold)
                     }
                 }
-                
-                Spacer(modifier = Modifier.height(10.dp))
-                
-                // Reset button
-                TextButton(onClick = onReset) {
-                    Text(
-                        text = "Reset to 0",
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 13.sp
-                    )
-                }
             }
-        }
-    }
-}
-
-@Composable
-private fun PresetChip(
-    amount: Int,
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "$amount",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 10.sp
-            )
         }
     }
 }
