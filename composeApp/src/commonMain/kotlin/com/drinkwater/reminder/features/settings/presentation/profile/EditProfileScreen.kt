@@ -45,50 +45,30 @@ private fun EditProfileScreenContent(
             Column {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f)
                 ) {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        TextButton(
-                            onClick = { onEvent(EditProfileEvent.OnCancelClick) }
+                        IconButton(
+                            onClick = { onEvent(EditProfileEvent.OnCancelClick) },
+                            modifier = Modifier.align(Alignment.CenterStart)
                         ) {
-                            Text(
-                                "Cancel",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
                         Text(
                             text = "Edit Profile",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.Center)
                         )
-
-                        TextButton(
-                            onClick = { onEvent(EditProfileEvent.OnSaveClick) },
-                            enabled = !state.isSaving
-                        ) {
-                            if (state.isSaving) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            } else {
-                                Text(
-                                    "Save",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
                     }
                 }
 
@@ -102,14 +82,18 @@ private fun EditProfileScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 40.dp)
         ) {
-            // Profile Image Section
+            // Scrollable content
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Profile Image Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box {
@@ -306,6 +290,31 @@ private fun EditProfileScreenContent(
                                 modifier = Modifier.weight(1f)
                             )
                         }
+                    }
+                }
+            }
+
+            // Save button at bottom (matching Activity Level/Daily Goal style)
+                Button(
+                    onClick = { onEvent(EditProfileEvent.OnSaveClick) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !state.isSaving
+                ) {
+                    if (state.isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(
+                            "Save",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

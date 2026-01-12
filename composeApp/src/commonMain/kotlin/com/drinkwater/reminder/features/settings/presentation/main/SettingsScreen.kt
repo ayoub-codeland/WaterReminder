@@ -69,12 +69,38 @@ fun SettingsScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.background)
-            .padding(bottom = 24.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
+        // Settings Top Bar
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                androidx.compose.material3.Text(
+                    text = "Settings",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+
+        androidx.compose.material3.HorizontalDivider(
+            color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .background(MaterialTheme.colorScheme.background)
+                .padding(bottom = 24.dp)
+        ) {
             ProfileCard(
                 userName = state.userName,
                 dailyGoal = state.dailyGoal,
@@ -125,6 +151,7 @@ fun SettingsScreen(
                     viewModel.onEvent(SettingsEvent.OnTermsOfServiceClick)
                 }
             )
+        }
     }
 }
 
