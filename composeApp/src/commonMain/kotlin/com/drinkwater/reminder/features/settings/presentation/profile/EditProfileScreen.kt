@@ -293,29 +293,29 @@ private fun EditProfileScreenContent(
                     }
                 }
             }
+        }
 
             // Save button at bottom (matching Activity Level/Daily Goal style)
-                Button(
-                    onClick = { onEvent(EditProfileEvent.OnSaveClick) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !state.isSaving
-                ) {
-                    if (state.isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(
-                            "Save",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+            Button(
+                onClick = { onEvent(EditProfileEvent.OnSaveClick) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                enabled = !state.isSaving
+            ) {
+                if (state.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        "Save",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
