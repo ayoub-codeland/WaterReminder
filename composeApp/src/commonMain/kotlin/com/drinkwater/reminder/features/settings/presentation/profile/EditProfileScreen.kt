@@ -93,9 +93,9 @@ private fun EditProfileScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                        .padding(top = 24.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                 Box {
                     // Profile Image
                     Box(
