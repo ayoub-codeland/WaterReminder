@@ -463,7 +463,6 @@ private fun ScheduleItem(
 
         if (showDivider) {
             HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
             )
         }
@@ -535,7 +534,6 @@ private fun ScheduleTimeItem(
 
         if (showDivider) {
             HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
             )
         }
