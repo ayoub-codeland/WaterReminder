@@ -23,6 +23,7 @@ import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeigh
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesScreen
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesSideEffect
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesViewModel
+import com.drinkwater.reminder.features.settings.presentation.share.ShareScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -45,6 +46,7 @@ fun NavGraphBuilder.settingsGraph(
         updateActivityScreen(navigator)
         updateGoalScreen(navigator)
         notificationPreferencesScreen(navigator)
+        shareScreen(navigator)
     }
 }
 
@@ -68,7 +70,7 @@ private fun NavGraphBuilder.settingsMainScreen(
                 SettingsEffect.NavigateToActivitySettings -> navigator.navigateToUpdateActivity()
                 SettingsEffect.NavigateToGoalSettings -> navigator.navigateToUpdateGoal()
                 SettingsEffect.NavigateToNotifications -> navigator.navigateToNotifications()
-                SettingsEffect.ShareApp -> navigator.shareApp()
+                SettingsEffect.NavigateToShare -> navigator.navigateToShare()
                 SettingsEffect.RateApp -> navigator.rateApp()
                 is SettingsEffect.OpenUrl -> navigator.openUrl(effect.url)
             }
@@ -180,5 +182,17 @@ private fun NavGraphBuilder.notificationPreferencesScreen(
                 }
             }
         }
+    }
+}
+
+private fun NavGraphBuilder.shareScreen(
+    navigator: SettingsNavigator
+) {
+    composable(SettingsDestination.Share.route) {
+        ShareScreen(
+            onBackClick = { navigator.navigateBack() },
+            onShareClick = { navigator.shareApp() },
+            onCopyLinkClick = { navigator.copyLink() }
+        )
     }
 }

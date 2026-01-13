@@ -57,7 +57,7 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.OnShareClick -> {
-                sendEffect(SettingsEffect.ShareApp)
+                sendEffect(SettingsEffect.NavigateToShare)
             }
 
             is SettingsEvent.OnRateAppClick -> {

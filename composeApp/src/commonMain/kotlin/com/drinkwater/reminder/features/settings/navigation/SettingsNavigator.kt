@@ -65,6 +65,12 @@ class SettingsNavigator(private val navController: NavController) {
         // TODO: Platform-specific URL opening
     }
 
+    fun navigateToShare() {
+        navController.navigate(SettingsDestination.Share.route) {
+            launchSingleTop = true
+        }
+    }
+
     fun shareApp() {
         // TODO: Platform-specific app sharing
         // Opens native share sheet with app link
@@ -73,5 +79,10 @@ class SettingsNavigator(private val navController: NavController) {
     fun rateApp() {
         // TODO: Platform-specific app rating
         // Opens Play Store/App Store rating page
+    }
+
+    fun copyLink() {
+        // TODO: Platform-specific clipboard copy
+        // Copies app link to clipboard
     }
 }
