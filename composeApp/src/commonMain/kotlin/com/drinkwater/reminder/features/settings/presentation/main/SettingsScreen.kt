@@ -23,9 +23,10 @@ import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.LocalDrink
 import androidx.compose.material.icons.outlined.MonitorWeight
 import androidx.compose.material.icons.outlined.NotificationsActive
@@ -133,12 +134,17 @@ fun SettingsScreen(
 
             AppPreferencesSection(
                 volumeUnit = state.volumeUnit,
-                startOfWeek = state.startOfWeek,
                 onVolumeUnitChanged = { unit ->
                     viewModel.onEvent(SettingsEvent.OnVolumeUnitChanged(unit))
+                }
+            )
+
+            SupportShareSection(
+                onShareClick = {
+                    viewModel.onEvent(SettingsEvent.OnShareClick)
                 },
-                onStartOfWeekClick = {
-                    viewModel.onEvent(SettingsEvent.OnStartOfWeekClick)
+                onRateClick = {
+                    viewModel.onEvent(SettingsEvent.OnRateAppClick)
                 }
             )
 
@@ -515,9 +521,7 @@ private fun NotificationsSection(onNotificationClick: () -> Unit) {
 @Composable
 private fun AppPreferencesSection(
     volumeUnit: VolumeUnit,
-    startOfWeek: String,
-    onVolumeUnitChanged: (VolumeUnit) -> Unit,
-    onStartOfWeekClick: () -> Unit
+    onVolumeUnitChanged: (VolumeUnit) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -543,17 +547,6 @@ private fun AppPreferencesSection(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 SettingsItem(
-                    icon = Icons.Outlined.CalendarMonth,
-                    iconBackgroundColor = Color(0xFFFEE2E2),
-                    iconTint = Color(0xFFEF4444),
-                    title = "Start of Week",
-                    value = startOfWeek,
-                    valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    showDivider = true,
-                    onClick = onStartOfWeekClick
-                )
-
-                SettingsItem(
                     icon = Icons.Default.Straighten,
                     iconBackgroundColor = Color(0xFFCCFBF1),
                     iconTint = Color(0xFF0D9488),
@@ -568,6 +561,60 @@ private fun AppPreferencesSection(
                         )
                     },
                     onClick = { onVolumeUnitChanged(volumeUnit) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SupportShareSection(
+    onShareClick: () -> Unit,
+    onRateClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp, bottom = 8.dp)
+    ) {
+        Text(
+            text = "SUPPORT & SHARE",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+        )
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadowSm(shape = RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surface,
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                SettingsItem(
+                    icon = Icons.Default.Share,
+                    iconBackgroundColor = Color(0xFFDCFCE7),
+                    iconTint = Color(0xFF16A34A),
+                    title = "Share with Friends",
+                    value = null,
+                    valueColor = null,
+                    showDivider = true,
+                    onClick = onShareClick
+                )
+
+                SettingsItem(
+                    icon = Icons.Default.Star,
+                    iconBackgroundColor = Color(0xFFFEF3C7),
+                    iconTint = Color(0xFFEAB308),
+                    title = "Rate App",
+                    value = null,
+                    valueColor = null,
+                    showDivider = false,
+                    onClick = onRateClick
                 )
             }
         }

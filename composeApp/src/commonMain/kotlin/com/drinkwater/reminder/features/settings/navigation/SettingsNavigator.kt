@@ -64,4 +64,14 @@ class SettingsNavigator(private val navController: NavController) {
     fun openUrl(url: String) {
         // TODO: Platform-specific URL opening
     }
+
+    fun shareApp() {
+        // TODO: Platform-specific app sharing
+        // Opens native share sheet with app link
+    }
+
+    fun rateApp() {
+        // TODO: Platform-specific app rating
+        // Opens Play Store/App Store rating page
+    }
 }

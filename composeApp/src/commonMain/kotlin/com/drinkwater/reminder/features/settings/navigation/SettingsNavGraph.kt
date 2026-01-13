@@ -68,7 +68,8 @@ private fun NavGraphBuilder.settingsMainScreen(
                 SettingsEffect.NavigateToActivitySettings -> navigator.navigateToUpdateActivity()
                 SettingsEffect.NavigateToGoalSettings -> navigator.navigateToUpdateGoal()
                 SettingsEffect.NavigateToNotifications -> navigator.navigateToNotifications()
-                SettingsEffect.NavigateToStartOfWeek -> {}
+                SettingsEffect.ShareApp -> navigator.shareApp()
+                SettingsEffect.RateApp -> navigator.rateApp()
                 is SettingsEffect.OpenUrl -> navigator.openUrl(effect.url)
             }
         }

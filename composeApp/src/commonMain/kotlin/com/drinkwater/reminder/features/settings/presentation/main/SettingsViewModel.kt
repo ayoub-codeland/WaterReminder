@@ -56,8 +56,12 @@ class SettingsViewModel(
                 handleVolumeUnitChange(event.unit)
             }
 
-            is SettingsEvent.OnStartOfWeekClick -> {
-                sendEffect(SettingsEffect.NavigateToStartOfWeek)
+            is SettingsEvent.OnShareClick -> {
+                sendEffect(SettingsEffect.ShareApp)
+            }
+
+            is SettingsEvent.OnRateAppClick -> {
+                sendEffect(SettingsEffect.RateApp)
             }
 
             is SettingsEvent.OnPrivacyPolicyClick -> {

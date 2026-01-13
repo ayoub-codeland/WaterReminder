@@ -10,7 +10,8 @@ sealed interface SettingsEvent : UiEvent {
     data object OnDailyGoalClick : SettingsEvent
     data object OnNotificationPreferencesClick : SettingsEvent
     data class OnVolumeUnitChanged(val unit: VolumeUnit) : SettingsEvent
-    data object OnStartOfWeekClick : SettingsEvent
+    data object OnShareClick : SettingsEvent
+    data object OnRateAppClick : SettingsEvent
     data object OnPrivacyPolicyClick : SettingsEvent
     data object OnTermsOfServiceClick : SettingsEvent
     data object OnBackClick : SettingsEvent
