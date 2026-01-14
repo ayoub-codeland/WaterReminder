@@ -1,14 +1,38 @@
 package com.drinkwater.reminder.features.onboarding.presentation.welcome
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.drinkwater.reminder.core.ui.components.AppScaffold
+import org.jetbrains.compose.resources.painterResource
+import waterreminderapp.composeapp.generated.resources.Res
+import waterreminderapp.composeapp.generated.resources.splash_bg
 
 /**
  * Welcome Screen with proper system insets handling
@@ -19,81 +43,95 @@ import com.drinkwater.reminder.core.ui.components.AppScaffold
 fun WelcomeScreen(
     onNavigateToProfileSetup: () -> Unit
 ) {
-    AppScaffold(
-        bottomBar = {
-            // Bottom CTA buttons - automatically respects navigation bar insets
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Primary button
-                Button(
-                    onClick = onNavigateToProfileSetup,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text(
-                        text = "Get Started",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+    Box(modifier = Modifier.fillMaxSize()) {
 
-                // Secondary button (optional)
-                TextButton(
-                    onClick = { /* Skip or login */ },
-                    modifier = Modifier.fillMaxWidth()
+        SplashBackground()
+
+        AppScaffold(
+            modifier = Modifier.fillMaxSize(), bottomBar = {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                        .padding(bottom = 48.dp, top = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "I already have an account",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Button(
+                        onClick = onNavigateToProfileSetup,
+                        modifier = Modifier.fillMaxWidth().height(64.dp).shadow(
+                            elevation = 12.dp,
+                            shape = RoundedCornerShape(16.dp),
+                            spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = "Begin Your Journey",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                letterSpacing = 0.5.sp
+                            ),
+                            color = Color.White
+                        )
+                    }
                 }
+            }) { _ ->
+            Column(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        append("Hydration, \n")
+                        withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                            append("Evolved.")
+                        }
+                    }, style = MaterialTheme.typography.displayMedium, textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Stop just counting cups. Start building sustainable habits backed by behavioral science and your personal data.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF334155),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.widthIn(max = 320.dp)
+                )
             }
         }
-    ) { _ ->
-        // Main content - automatically respects status bar insets
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.height(40.dp))
+    }
+}
 
-            // App logo or illustration
-            // Icon(...) or Image(...)
+@Composable
+fun SplashBackground() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(Res.drawable.splash_bg),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
-            Spacer(modifier = Modifier.height(40.dp))
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.3f))
+        )
 
-            // Hero title
-            Text(
-                text = "Hydrate Smarter,\nFeel Better",
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.onBackground
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color(0xFF06B6D4).copy(alpha = 0.1f))
+        )
+
+        val gradientColor = Color.White
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0.0f to Color.Transparent,
+                    0.6f to gradientColor.copy(alpha = 0.4f),
+                    1.0f to gradientColor
+                )
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Description
-            Text(
-                text = "Track your daily water intake with personalized goals and smart reminders.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Additional content
-        }
+        )
     }
 }
