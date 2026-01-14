@@ -78,11 +78,11 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.OnPrivacyPolicyClick -> {
-                sendEffect(SettingsEffect.OpenUrl("https://yourwebsite.com/privacy-policy"))
+                sendEffect(SettingsEffect.OpenUrl("https://sites.google.com/view/waterly-reminder/home"))
             }
 
             is SettingsEvent.OnTermsOfServiceClick -> {
-                sendEffect(SettingsEffect.OpenUrl("https://yourwebsite.com/terms-of-service"))
+                sendEffect(SettingsEffect.OpenUrl("https://sites.google.com/view/waterly-terms-and-services/home"))
             }
         }
     }
