@@ -144,7 +144,8 @@ private fun HomeContent(
             WaterCupSection(
                 currentIntake = state.currentIntake,
                 dailyGoal = state.dailyGoal,
-                progressPercent = state.progressPercent
+                progressPercent = state.progressPercent,
+                onReset = { onEvent(HomeEvent.OnResetIntake) }
             )
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -207,8 +208,11 @@ private fun StreakBadge(streakDays: Int) {
 private fun WaterCupSection(
     currentIntake: Int,
     dailyGoal: Int,
-    progressPercent: Int
+    progressPercent: Int,
+    onReset: () -> Unit
 ) {
+    var showResetDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -221,29 +225,102 @@ private fun WaterCupSection(
             cupHeight = 280.dp,
             showTestPopup = false
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // Progress indicator pill
-        Surface(
-            shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+
+        // Progress indicator pill with reset button
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "$progressPercent% Complete",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            ) {
+                Text(
+                    text = "$progressPercent% Complete",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+
+            // Reset button - subtle and elegant
+            if (currentIntake > 0) {
+                Surface(
+                    onClick = { showResetDialog = true },
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset water intake",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
         }
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         // Goal text
         Text(
             text = "Goal: ${formatAmount(dailyGoal)} ml",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    // Reset confirmation dialog
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "Reset Today's Water Intake?",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "This will reset your water intake for today to 0ml. Your streak and history will remain intact.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onReset()
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Reset")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

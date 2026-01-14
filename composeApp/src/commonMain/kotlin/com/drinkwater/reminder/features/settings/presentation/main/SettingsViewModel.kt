@@ -25,6 +25,19 @@ class SettingsViewModel(
 
     init {
         observeUserProfile()
+        loadVolumeUnit()
+    }
+
+    private fun loadVolumeUnit() {
+        viewModelScope.launch {
+            try {
+                val volumeUnit = repository.getVolumeUnit()
+                updateState { copy(volumeUnit = volumeUnit) }
+            } catch (e: Exception) {
+                // Use default ML if load fails
+                updateState { copy(volumeUnit = VolumeUnit.ML) }
+            }
+        }
     }
 
     override fun onEvent(event: SettingsEvent) {
@@ -97,8 +110,15 @@ class SettingsViewModel(
 
     private fun handleVolumeUnitChange(unit: VolumeUnit) {
         viewModelScope.launch {
-            updateState { copy(volumeUnit = unit) }
-            // Unit preference saved to DataStore
+            try {
+                // Save to repository
+                repository.saveVolumeUnit(unit)
+                // Update UI state
+                updateState { copy(volumeUnit = unit) }
+            } catch (e: Exception) {
+                // Log error and silently fail - volume unit will remain unchanged
+                e.printStackTrace()
+            }
         }
     }
 }
