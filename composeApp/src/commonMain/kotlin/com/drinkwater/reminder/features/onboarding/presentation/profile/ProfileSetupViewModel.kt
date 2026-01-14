@@ -2,15 +2,22 @@ package com.drinkwater.reminder.features.onboarding.presentation.profile
 
 import androidx.lifecycle.viewModelScope
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
+import com.drinkwater.reminder.core.domain.model.UserProfile
 import com.drinkwater.reminder.core.domain.model.WeightUnit
+import com.drinkwater.reminder.core.domain.usecase.CalculateDailyGoalUseCase
+import com.drinkwater.reminder.core.domain.usecase.SaveUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for Profile Setup Screen
+ * Saves user profile after calculation
  */
-class ProfileSetupViewModel : BaseViewModel<ProfileSetupUiState, ProfileSetupUiEvent, ProfileSetupUiEffect>(
+class ProfileSetupViewModel(
+    private val saveUserProfileUseCase: SaveUserProfileUseCase,
+    private val calculateDailyGoalUseCase: CalculateDailyGoalUseCase
+) : BaseViewModel<ProfileSetupUiState, ProfileSetupUiEvent, ProfileSetupUiEffect>(
     initialState = ProfileSetupUiState()
 ) {
     override fun onEvent(event: ProfileSetupUiEvent) {
@@ -37,33 +44,37 @@ class ProfileSetupViewModel : BaseViewModel<ProfileSetupUiState, ProfileSetupUiE
     }
     
     private fun handleCalculateGoal() {
-        val weight = currentState.weight.toIntOrNull()
+        val weight = currentState.weight.toFloatOrNull()
         if (weight == null || weight <= 0) return
-        
+
         updateState { copy(isCalculating = true) }
-        
         viewModelScope.launch {
             delay(300)
-            
-            // Convert to kg if needed
-            val weightInKg = if (currentState.weightUnit == WeightUnit.LBS) {
-                (weight * 0.453592).toInt()
-            } else {
-                weight
-            }
-            
-            // Calculate based on activity level
-            val baseAmount = weightInKg * 30
-            val activityMultiplier = when (currentState.activityLevel) {
-                ActivityLevel.SEDENTARY -> 1.0
-                ActivityLevel.LIGHT -> 1.1
-                ActivityLevel.MODERATE -> 1.2
-                ActivityLevel.ACTIVE -> 1.3
-                ActivityLevel.VERY_ACTIVE -> 1.5
-            }
-            
-            val dailyGoal = (baseAmount * activityMultiplier).toInt()
-            
+
+            // Calculate daily goal using the use case
+            val dailyGoal = calculateDailyGoalUseCase(
+                weight = weight,
+                weightUnit = currentState.weightUnit,
+                activityLevel = currentState.activityLevel,
+                biologicalSex = currentState.biologicalSex,
+                ageGroup = currentState.ageGroup
+            )
+
+            // Create and save user profile
+            val profile = UserProfile(
+                biologicalSex = currentState.biologicalSex,
+                ageGroup = currentState.ageGroup,
+                weight = weight,
+                weightUnit = currentState.weightUnit,
+                activityLevel = currentState.activityLevel,
+                dailyGoal = dailyGoal,
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            )
+
+            // Save profile to repository
+            saveUserProfileUseCase(profile)
+
             updateState { copy(isCalculating = false) }
             sendEffect(ProfileSetupUiEffect.NavigateToDashboard(dailyGoal))
         }

@@ -23,6 +23,7 @@ import com.drinkwater.reminder.features.home.domain.usecase.GetCurrentStreakUseC
 import com.drinkwater.reminder.features.home.domain.usecase.GetTodayIntakeUseCase
 import com.drinkwater.reminder.features.home.domain.usecase.ResetTodayIntakeUseCase
 import com.drinkwater.reminder.features.home.presentation.HomeViewModel
+import com.drinkwater.reminder.features.main.AppViewModel
 import com.drinkwater.reminder.features.progress.domain.usecase.GetAllTimeStatsUseCase
 import com.drinkwater.reminder.features.progress.domain.usecase.GetWeeklyStatsUseCase
 import com.drinkwater.reminder.features.progress.presentation.ProgressViewModel
@@ -35,6 +36,7 @@ import com.drinkwater.reminder.features.settings.presentation.main.SettingsViewM
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesViewModel
 import com.drinkwater.reminder.features.settings.presentation.profile.EditProfileViewModel
 import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeightViewModel
+import com.drinkwater.reminder.features.onboarding.presentation.profile.ProfileSetupViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.core.module.Module
@@ -52,7 +54,7 @@ val databaseModule = module {
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()
     }
-    
+
     single { get<WaterReminderDatabase>().waterIntakeDao() }
     single { get<WaterReminderDatabase>().dailySummaryDao() }
 }
@@ -77,13 +79,13 @@ val domainModule = module {
     factory { UpdateWeightUseCase(get(), get()) }
     factory { UpdateActivityLevelUseCase(get(), get()) }
     factory { GetDailyTipUseCase(get()) }
-    
+
     // Home use cases
     factory { AddWaterIntakeUseCase(get()) }
     factory { GetTodayIntakeUseCase(get()) }
     factory { GetCurrentStreakUseCase(get()) }
     factory { ResetTodayIntakeUseCase(get()) }
-    
+
     // Progress use cases
     factory { GetWeeklyStatsUseCase(get()) }
     factory { GetAllTimeStatsUseCase(get()) }
@@ -95,12 +97,16 @@ val domainModule = module {
 }
 
 val viewModelModule = module {
+    viewModel { AppViewModel(get()) }
+    // Onboarding feature
+    viewModel { ProfileSetupViewModel(get(), get()) }
+
     // Home feature
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
-    
+
     // Progress feature
     viewModel { ProgressViewModel(get(), get(), get()) }
-    
+
     // Settings feature
     viewModel { SettingsViewModel(get(), get()) }
     viewModel { EditProfileViewModel(get(), get()) }

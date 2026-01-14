@@ -1,8 +1,14 @@
 package com.drinkwater.reminder
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -11,107 +17,111 @@ import com.drinkwater.reminder.core.ui.components.AppBottomNavigation
 import com.drinkwater.reminder.core.ui.components.AppNavigationTab
 import com.drinkwater.reminder.core.ui.components.AppScaffold
 import com.drinkwater.reminder.features.home.navigation.homeGraph
+import com.drinkwater.reminder.features.main.AppUiState
+import com.drinkwater.reminder.features.main.AppViewModel
+import com.drinkwater.reminder.features.onboarding.navigation.onboardingGraph
 import com.drinkwater.reminder.features.progress.navigation.progressGraph
 import com.drinkwater.reminder.features.settings.navigation.settingsGraph
 import com.drinkwater.reminder.features.settings.presentation.notifications.RequestNotificationPermissionIfNeeded
+import org.koin.compose.viewmodel.koinViewModel
 
-/**
- * Main App Composable
- *
- * Following Clean Architecture principles:
- * - Navigation bar is centralized at app level (Single Source of Truth)
- * - Features are decoupled and don't know about each other
- * - Navigation state is derived from NavController
- * - Scalable design for adding new features
- */
 @Composable
 fun App() {
     AppTheme {
-        val navController = rememberNavController()
+        val viewModel: AppViewModel = koinViewModel()
 
-        // Request notification permission on first app launch
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
         var requestInitialPermission by remember { mutableStateOf(true) }
         RequestNotificationPermissionIfNeeded(
             shouldRequest = requestInitialPermission,
-            onPermissionResult = { _ ->
-                requestInitialPermission = false
-            }
+            onPermissionResult = { requestInitialPermission = false }
         )
 
-        // Observe current navigation state
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        when (val state = uiState) {
+            is AppUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            is AppUiState.Ready -> {
+                AppContent(startDestination = state.startDestination)
+            }
+        }
+    }
+}
 
-        // Determine which tab is currently active based on route
-        val currentTab = when {
+/**
+ * Extracted AppContent to keep the main App composable clean and focused on state switching.
+ * This component is responsible strictly for Navigation structure.
+ */
+@Composable
+private fun AppContent(startDestination: String) {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val currentTab = remember(currentRoute) {
+        when {
             currentRoute == "home" || currentRoute?.startsWith("home_graph") == true -> AppNavigationTab.HOME
             currentRoute == "progress" || currentRoute?.startsWith("progress_graph") == true -> AppNavigationTab.PROGRESS
             currentRoute?.startsWith("settings") == true -> AppNavigationTab.SETTINGS
-            else -> AppNavigationTab.HOME // Default fallback
+            else -> AppNavigationTab.HOME
         }
+    }
 
-        // Centralized scaffold with bottom navigation
-        AppScaffold(
-            bottomBar = {
+    val isOnboarding = currentRoute?.startsWith("onboarding") == true
+
+    AppScaffold(
+        bottomBar = {
+            if (!isOnboarding) {
                 AppBottomNavigation(
                     currentTab = currentTab,
                     onNavigateToHome = {
-                        // Prevent navigation if already on home tab
-                        if (currentTab != AppNavigationTab.HOME) {
-                            navController.navigate("home_graph") {
-                                // Clear entire back stack - tabs are peers, not hierarchical
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
-                            }
+                        navController.navigate("home_graph") {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     },
                     onNavigateToProgress = {
-                        // Prevent navigation if already on progress tab
-                        if (currentTab != AppNavigationTab.PROGRESS) {
-                            navController.navigate("progress_graph") {
-                                // Clear entire back stack - tabs are peers, not hierarchical
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
-                            }
+                        navController.navigate("progress_graph") {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     },
                     onNavigateToSettings = {
-                        // Prevent navigation if already on settings tab
-                        if (currentTab != AppNavigationTab.SETTINGS) {
-                            navController.navigate("settings_graph") {
-                                // Clear entire back stack - tabs are peers, not hierarchical
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
-                            }
+                        navController.navigate("settings_graph") {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 )
             }
-        ) { paddingValues ->
-            // Navigation host for feature graphs
-            NavHost(
+        }
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            onboardingGraph(
                 navController = navController,
-                startDestination = "home_graph",
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Home feature (Dashboard)
-                homeGraph(
-                    navController = navController,
-                    route = "home_graph"
-                )
+                route = "onboarding_graph",
+                onOnboardingComplete = {
+                    navController.navigate("home_graph") {
+                        popUpTo("onboarding_graph") { inclusive = true }
+                    }
+                }
+            )
 
-                // Progress feature (Analytics)
-                progressGraph(
-                    navController = navController,
-                    route = "progress_graph"
-                )
-
-                // Settings feature
-                settingsGraph(
-                    navController = navController,
-                    route = "settings_graph"
-                )
-            }
+            homeGraph(navController = navController, route = "home_graph")
+            progressGraph(navController = navController, route = "progress_graph")
+            settingsGraph(navController = navController, route = "settings_graph")
         }
     }
 }
