@@ -204,9 +204,13 @@ private fun NavGraphBuilder.updateNotificationScheduleScreen(
     navController: NavHostController
 ) {
     composable(SettingsDestination.UpdateNotificationSchedule.route) {
+        val navigator = rememberSettingsNavigator(navController)
         val viewModel = koinViewModel<NotificationPreferencesViewModel>()
 
-        UpdateNotificationScheduleScreen(viewModel = viewModel)
+        UpdateNotificationScheduleScreen(
+            viewModel = viewModel,
+            onBackClick = { navigator.navigateBack() }
+        )
     }
 }
 

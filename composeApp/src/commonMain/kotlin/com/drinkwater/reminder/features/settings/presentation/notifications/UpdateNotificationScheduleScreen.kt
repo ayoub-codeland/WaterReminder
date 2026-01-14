@@ -26,7 +26,8 @@ import com.drinkwater.reminder.core.ui.extensions.shadowSm
  */
 @Composable
 fun UpdateNotificationScheduleScreen(
-    viewModel: NotificationPreferencesViewModel
+    viewModel: NotificationPreferencesViewModel,
+    onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -35,12 +36,8 @@ fun UpdateNotificationScheduleScreen(
         onFrequencySelected = { frequency ->
             viewModel.onEvent(NotificationPreferencesEvent.OnFrequencySelected(frequency))
         },
-        onBackClick = {
-            viewModel.onEvent(NotificationPreferencesEvent.OnBackClick)
-        },
-        onSaveClick = {
-            viewModel.onEvent(NotificationPreferencesEvent.OnBackClick)
-        }
+        onBackClick = onBackClick,
+        onSaveClick = onBackClick
     )
 }
 
