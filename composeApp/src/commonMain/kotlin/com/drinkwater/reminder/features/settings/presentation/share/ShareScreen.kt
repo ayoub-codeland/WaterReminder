@@ -2,7 +2,18 @@ package com.drinkwater.reminder.features.settings.presentation.share
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -10,7 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.IosShare
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drinkwater.reminder.core.ui.components.AppScaffold
+import com.drinkwater.reminder.core.ui.extensions.shadowSm
 import org.jetbrains.compose.resources.painterResource
 import waterreminderapp.composeapp.generated.resources.Res
 import waterreminderapp.composeapp.generated.resources.share_image
@@ -81,34 +101,30 @@ fun ShareScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Share image with gradient overlay (aspect ratio 4:3)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4f / 3f)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
+                    .shadowSm(RoundedCornerShape(16.dp), elevation = 4.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
             ) {
-                // Background image
                 Image(
                     painter = painterResource(Res.drawable.share_image),
-                    contentDescription = "Share HydroTracker",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop
                 )
 
-                // Gradient overlay from bottom
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .matchParentSize()
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
                                     Color.Transparent,
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0.3f)
-                                ),
-                                startY = 0f,
-                                endY = Float.POSITIVE_INFINITY
+                                    Color(0xFFF5F7F8)
+                                )
                             )
                         )
                 )
@@ -116,7 +132,6 @@ fun ShareScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Title - matching HTML exactly
             Text(
                 text = "Hydrate Better Together",
                 fontSize = 30.sp,
@@ -129,7 +144,6 @@ fun ShareScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Description - matching HTML exactly
             Text(
                 text = "Help a friend build lasting habits. Science shows we succeed 85% more often when we have support from someone we trust.",
                 fontSize = 16.sp,
@@ -142,7 +156,6 @@ fun ShareScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Invite a Friend button - matching HTML exactly
             Button(
                 onClick = onShareClick,
                 modifier = Modifier
@@ -181,7 +194,6 @@ fun ShareScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Copy link button - matching HTML exactly
             OutlinedButton(
                 onClick = onCopyLinkClick,
                 modifier = Modifier
