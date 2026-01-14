@@ -29,37 +29,19 @@ actual class NotificationScheduler(
      * Uses WorkManager with PeriodicWorkRequest based on user's frequency preference.
      * Minimum frequency is 15 minutes (WorkManager limitation).
      *
-     * TEST MODE: Set TEST_MODE_ENABLED = true to use seconds instead of minutes.
-     * This allows testing with intervals like 30 seconds instead of 30 minutes.
-     *
      * @param preference Notification preferences
      */
     actual suspend fun scheduleNotifications(preference: NotificationPreference) {
-        // Cancel existing work first
         cancelAllNotifications()
 
-        // TEST MODE: Change to true for quick testing (uses seconds instead of minutes)
-        val TEST_MODE_ENABLED = false
+        val frequencyMinutes = preference.frequencyMinutes.coerceAtLeast(15)
 
-        val (interval, timeUnit) = if (TEST_MODE_ENABLED) {
-            // Test mode: Use seconds (minimum 15 seconds for WorkManager)
-            // Set frequency to 30 in UI = notification every 30 SECONDS
-            val seconds = preference.frequencyMinutes.coerceAtLeast(15)
-            Pair(seconds.toLong(), TimeUnit.SECONDS)
-        } else {
-            // Production: Use minutes (minimum 15 minutes for WorkManager)
-            val minutes = preference.frequencyMinutes.coerceAtLeast(15)
-            Pair(minutes.toLong(), TimeUnit.MINUTES)
-        }
-
-        // Create periodic work request
         val workRequest = PeriodicWorkRequestBuilder<WaterReminderWorker>(
-            repeatInterval = interval,
-            repeatIntervalTimeUnit = timeUnit
+            repeatInterval = frequencyMinutes.toLong(),
+            repeatIntervalTimeUnit = TimeUnit.MINUTES
         )
             .build()
 
-        // Enqueue work (replace existing with same name)
         workManager.enqueueUniquePeriodicWork(
             WaterReminderWorker.WORK_NAME,
             ExistingPeriodicWorkPolicy.UPDATE,

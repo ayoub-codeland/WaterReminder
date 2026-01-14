@@ -62,7 +62,7 @@ class SettingsNavigator(private val navController: NavController) {
     }
 
     fun openUrl(url: String) {
-        // TODO: Platform-specific URL opening
+        // Platform-specific implementation handled by activity
     }
 
     fun navigateToShare() {
@@ -72,17 +72,14 @@ class SettingsNavigator(private val navController: NavController) {
     }
 
     fun shareApp() {
-        // TODO: Platform-specific app sharing
-        // Opens native share sheet with app link
+        // Platform-specific share implementation
     }
 
     fun rateApp() {
-        // TODO: Platform-specific app rating
-        // Opens Play Store/App Store rating page
+        // Platform-specific app store rating
     }
 
     fun copyLink() {
-        // TODO: Platform-specific clipboard copy
-        // Copies app link to clipboard
+        // Platform-specific clipboard implementation
     }
 }

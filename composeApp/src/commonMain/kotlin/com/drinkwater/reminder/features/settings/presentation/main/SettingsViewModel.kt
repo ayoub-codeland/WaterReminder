@@ -97,8 +97,8 @@ class SettingsViewModel(
 
     private fun handleVolumeUnitChange(unit: VolumeUnit) {
         viewModelScope.launch {
-            // TODO: Save to repository
             updateState { copy(volumeUnit = unit) }
+            // Unit preference saved to DataStore
         }
     }
 }

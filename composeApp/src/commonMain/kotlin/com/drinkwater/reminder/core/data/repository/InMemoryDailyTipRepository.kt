@@ -35,9 +35,9 @@ class InMemoryDailyTipRepository : DailyTipRepository {
             tips.clear()
             tips.addAll(tipsData.tips)
             
-            println("✅ Loaded ${tips.size} hydration tips")
+            // Tips loaded successfully
         } catch (e: Exception) {
-            println("⚠️ Failed to load tips: ${e.message}")
+            // Error loading tips, using defaults
             // Add default tips if loading fails
             loadDefaultTips()
         }

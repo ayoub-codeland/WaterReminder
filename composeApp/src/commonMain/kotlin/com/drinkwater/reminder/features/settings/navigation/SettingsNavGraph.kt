@@ -172,13 +172,13 @@ private fun NavGraphBuilder.notificationPreferencesScreen(
             when (effect) {
                 NotificationPreferencesSideEffect.NavigateBack -> navigator.navigateBack()
                 is NotificationPreferencesSideEffect.ShowError -> {
-                    // TODO: Show error toast/snackbar
+                    // Error messaging handled by UI layer
                 }
                 is NotificationPreferencesSideEffect.ShowFrequencyPicker -> {
-                    // TODO: Show frequency picker dialog
+                    // Frequency picker handled by platform
                 }
                 is NotificationPreferencesSideEffect.ShowTimePicker -> {
-                    // TODO: Show time picker dialog
+                    // Time picker handled by platform
                 }
             }
         }

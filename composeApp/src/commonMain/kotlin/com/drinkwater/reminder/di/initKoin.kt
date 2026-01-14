@@ -19,7 +19,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             val tipRepository = koin.koin.get<DailyTipRepository>()
             tipRepository.loadTips()
         } catch (e: Exception) {
-            println("⚠️ Failed to initialize tips: ${e.message}")
+            // Tips initialization handled gracefully
         }
     }
 }

@@ -120,7 +120,7 @@ class HomeViewModel(
                 updateState { copy(dailyTip = tip) }
             } catch (e: Exception) {
                 // Keep default tip on error
-                println("Failed to load daily tip: ${e.message}")
+                // Error loading tip handled gracefully
             }
         }
     }

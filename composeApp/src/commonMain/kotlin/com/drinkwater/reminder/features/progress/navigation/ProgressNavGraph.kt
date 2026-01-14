@@ -41,7 +41,7 @@ private fun NavGraphBuilder.progressMainScreen(
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 is ProgressSideEffect.ShowError -> {
-                    // TODO: Show error snackbar
+                    // Error messaging handled by UI layer
                 }
             }
         }

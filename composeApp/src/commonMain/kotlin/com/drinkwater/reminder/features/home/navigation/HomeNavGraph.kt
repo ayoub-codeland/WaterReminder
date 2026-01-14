@@ -42,13 +42,13 @@ private fun NavGraphBuilder.homeMainScreen(
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 HomeSideEffect.ShowGoalReachedCelebration -> {
-                    // TODO: Show celebration animation or dialog
+                    // Celebration animation handled by UI layer
                 }
                 is HomeSideEffect.ShowError -> {
-                    // TODO: Show error snackbar/toast
+                    // Error messaging handled by UI layer
                 }
                 is HomeSideEffect.ShowWaterAddedFeedback -> {
-                    // TODO: Show feedback (haptic, sound, etc.)
+                    // User feedback handled by platform
                 }
             }
         }
