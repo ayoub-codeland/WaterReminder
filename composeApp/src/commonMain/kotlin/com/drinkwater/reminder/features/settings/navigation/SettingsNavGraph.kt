@@ -211,6 +211,16 @@ private fun NavGraphBuilder.updateNotificationScheduleScreen(
             viewModel = viewModel,
             onBackClick = { navigator.navigateBack() }
         )
+
+        // Handle navigation effects from ViewModel
+        HandleEffects(viewModel.effect) { effect ->
+            when (effect) {
+                NotificationPreferencesSideEffect.NavigateBack -> navigator.navigateBack()
+                else -> {
+                    // Other effects not relevant for this screen
+                }
+            }
+        }
     }
 }
 

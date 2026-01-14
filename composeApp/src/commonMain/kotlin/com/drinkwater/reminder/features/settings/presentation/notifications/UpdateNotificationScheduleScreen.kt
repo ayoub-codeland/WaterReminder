@@ -33,11 +33,10 @@ fun UpdateNotificationScheduleScreen(
 
     UpdateNotificationScheduleContent(
         currentFrequency = state.frequencyMinutes,
-        onFrequencySelected = { frequency ->
-            viewModel.onEvent(NotificationPreferencesEvent.OnFrequencySelected(frequency))
+        onSaveClick = { frequency ->
+            viewModel.onEvent(NotificationPreferencesEvent.OnSaveFrequencyAndNavigateBack(frequency))
         },
-        onBackClick = onBackClick,
-        onSaveClick = onBackClick
+        onBackClick = onBackClick
     )
 }
 
@@ -45,9 +44,8 @@ fun UpdateNotificationScheduleScreen(
 @Composable
 private fun UpdateNotificationScheduleContent(
     currentFrequency: Int,
-    onFrequencySelected: (Int) -> Unit,
-    onBackClick: () -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: (Int) -> Unit,
+    onBackClick: () -> Unit
 ) {
     // Available notification frequency options (in minutes)
     val frequencyOptions = listOf(15, 30, 45, 60, 90, 120, 180)
@@ -156,8 +154,7 @@ private fun UpdateNotificationScheduleContent(
                 ) {
                     Button(
                         onClick = {
-                            onFrequencySelected(selectedFrequency)
-                            onSaveClick()
+                            onSaveClick(selectedFrequency)
                         },
                         modifier = Modifier
                             .fillMaxWidth()

@@ -52,6 +52,11 @@ class NotificationPreferencesViewModel(
                 savePreferences()
             }
 
+            is NotificationPreferencesEvent.OnSaveFrequencyAndNavigateBack -> {
+                updateState { copy(frequencyMinutes = event.frequencyMinutes) }
+                savePreferencesAndNavigateBack()
+            }
+
             is NotificationPreferencesEvent.OnWakeUpTimeClick -> {
                 sendEffect(
                     NotificationPreferencesSideEffect.ShowTimePicker(
@@ -154,6 +159,36 @@ class NotificationPreferencesViewModel(
                 )
 
                 saveNotificationPreferencesUseCase(preference)
+            } catch (e: Exception) {
+                sendEffect(
+                    NotificationPreferencesSideEffect.ShowError(
+                        e.message ?: "Failed to save preferences"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Save preferences and navigate back only after save completes.
+     * Ensures data is persisted before navigation.
+     */
+    private fun savePreferencesAndNavigateBack() {
+        viewModelScope.launch {
+            try {
+                val preference = NotificationPreference(
+                    isEnabled = currentState.isEnabled,
+                    frequencyMinutes = currentState.frequencyMinutes,
+                    wakeUpTime = convertTo24HourFormat(currentState.wakeUpTime),
+                    bedtime = convertTo24HourFormat(currentState.bedtime),
+                    pauseWhenGoalReached = currentState.pauseWhenGoalReached
+                )
+
+                // Wait for save to complete
+                saveNotificationPreferencesUseCase(preference)
+
+                // Only navigate back after successful save
+                sendEffect(NotificationPreferencesSideEffect.NavigateBack)
             } catch (e: Exception) {
                 sendEffect(
                     NotificationPreferencesSideEffect.ShowError(
