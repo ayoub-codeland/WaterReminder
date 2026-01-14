@@ -170,25 +170,30 @@ class NotificationPreferencesViewModel(
     }
 
     /**
-     * Save preferences and navigate back only after save completes.
-     * Ensures data is persisted before navigation.
+     * Save ONLY frequency preference and navigate back after save completes.
+     * Only updates frequencyMinutes field, preserves all other settings.
      */
     private fun savePreferencesAndNavigateBack() {
         viewModelScope.launch {
             try {
-                val preference = NotificationPreference(
-                    isEnabled = currentState.isEnabled,
-                    frequencyMinutes = currentState.frequencyMinutes,
-                    wakeUpTime = convertTo24HourFormat(currentState.wakeUpTime),
-                    bedtime = convertTo24HourFormat(currentState.bedtime),
-                    pauseWhenGoalReached = currentState.pauseWhenGoalReached
-                )
+                // Get current preferences from repository (source of truth)
+                val currentPreference = getNotificationPreferencesUseCase()
 
-                // Wait for save to complete
-                saveNotificationPreferencesUseCase(preference)
+                if (currentPreference != null) {
+                    // Update ONLY frequency, keep everything else unchanged
+                    val updatedPreference = currentPreference.copy(
+                        frequencyMinutes = currentState.frequencyMinutes
+                    )
 
-                // Only navigate back after successful save
-                sendEffect(NotificationPreferencesSideEffect.NavigateBack)
+                    // Wait for save to complete
+                    saveNotificationPreferencesUseCase(updatedPreference)
+
+                    // Only navigate back after successful save
+                    sendEffect(NotificationPreferencesSideEffect.NavigateBack)
+                } else {
+                    // Shouldn't happen, but handle gracefully
+                    sendEffect(NotificationPreferencesSideEffect.ShowError("No preferences found"))
+                }
             } catch (e: Exception) {
                 sendEffect(
                     NotificationPreferencesSideEffect.ShowError(
