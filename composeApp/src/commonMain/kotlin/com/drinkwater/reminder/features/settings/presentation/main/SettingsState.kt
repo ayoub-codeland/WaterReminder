@@ -12,6 +12,6 @@ data class SettingsState(
     val weightUnit: WeightUnit = WeightUnit.KG,
     val activityLevel: ActivityLevel = ActivityLevel.MODERATE,
     val volumeUnit: VolumeUnit = VolumeUnit.ML,
-    val appVersion: String = "v1.0.2",
+    val appVersion: String = "v1.0.0",
     val isLoading: Boolean = false
 ) : UiState

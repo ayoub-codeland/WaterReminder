@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -59,7 +60,6 @@ fun HomeScreen(
         )
     }
 
-    // Add Water Dialog
     if (state.showAddWaterDialog) {
         AddWaterDialog(
             state = state,
@@ -110,9 +110,7 @@ private fun HomeContent(
     state: HomeState,
     onEvent: (HomeEvent) -> Unit
 ) {
-    // Background glow effect
     Box(modifier = Modifier.fillMaxSize()) {
-        // Decorative blur circle (matches HTML reference)
         Box(
             modifier = Modifier
                 .offset(x = (-50).dp, y = (-100).dp)
@@ -135,12 +133,10 @@ private fun HomeContent(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 24.dp)
         ) {
-            // Streak Badge
             StreakBadge(streakDays = state.currentStreak)
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Water Cup Component - CENTER PIECE
             WaterCupSection(
                 state = state,
                 onReset = { onEvent(HomeEvent.OnResetIntake) }
@@ -148,7 +144,6 @@ private fun HomeContent(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Daily Tip Card
             AnimatedVisibility(
                 visible = state.showDailyTip,
                 enter = fadeIn() + expandVertically(),
@@ -164,7 +159,6 @@ private fun HomeContent(
                 Spacer(modifier = Modifier.height(24.dp))
             }
             
-            // Quick Add Section
             QuickAddSection(
                 state = state,
                 onAddGlass = { onEvent(HomeEvent.OnAddGlass) },
@@ -210,7 +204,6 @@ private fun WaterCupSection(
 ) {
     var showResetDialog by remember { mutableStateOf(false) }
 
-    // Convert values for display
     val displayCurrentIntake = state.toDisplayValue(state.currentIntake)
     val displayDailyGoal = state.toDisplayValue(state.dailyGoal)
 
@@ -218,7 +211,6 @@ private fun WaterCupSection(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Water Cup - Clean display without any container/background
         WaterCupComponent(
             currentAmount = displayCurrentIntake,
             goalAmount = displayDailyGoal,
@@ -230,7 +222,6 @@ private fun WaterCupSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Progress indicator pill with reset button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -247,7 +238,6 @@ private fun WaterCupSection(
                 )
             }
 
-            // Reset button - subtle and elegant, follows app theme
             if (state.currentIntake > 0) {
                 Surface(
                     onClick = { showResetDialog = true },
@@ -272,7 +262,6 @@ private fun WaterCupSection(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Goal text
         Text(
             text = "Goal: ${formatAmount(displayDailyGoal)} ${state.unitLabel}",
             style = MaterialTheme.typography.bodyMedium,
@@ -280,7 +269,6 @@ private fun WaterCupSection(
         )
     }
 
-    // Reset confirmation dialog
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -340,18 +328,15 @@ private fun DailyTipCard(
         color = MaterialTheme.colorScheme.surface
     ) {
         Box {
-            // Background image with opacity filter (matches HTML: opacity-10)
-            // Using matchParentSize to fill entire card regardless of content height
-            androidx.compose.foundation.Image(
+            Image(
                 painter = painterResource(Res.drawable.tip_bg),
                 contentDescription = null,
                 modifier = Modifier
                     .matchParentSize()
                     .alpha(0.10f),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                contentScale = ContentScale.Crop
             )
 
-            // Gradient overlay (matches HTML: bg-gradient-to-r from-blue-50/50 to-transparent)
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -421,7 +406,6 @@ private fun QuickAddSection(
     onAddBottle: () -> Unit,
     onCustomClick: () -> Unit
 ) {
-    // Convert preset values for display
     val glassAmount = state.toDisplayValue(250)
     val bottleAmount = state.toDisplayValue(500)
 
@@ -446,7 +430,6 @@ private fun QuickAddSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Quick add buttons grid
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -470,7 +453,6 @@ private fun QuickAddSection(
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        // Custom button
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -558,10 +540,6 @@ private fun QuickAddButton(
     }
 }
 
-// ============================================================================
-// Add Water Dialog
-// ============================================================================
-
 @Composable
 private fun AddWaterDialog(
     state: HomeState,
@@ -583,7 +561,6 @@ private fun AddWaterDialog(
                     .widthIn(min = 280.dp, max = 380.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
                 Text(
                     text = "Add Water",
                     style = MaterialTheme.typography.titleMedium,
@@ -594,7 +571,6 @@ private fun AddWaterDialog(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Subtitle
                 Text(
                     text = "Enter amount in ${state.unitLabel}",
                     style = MaterialTheme.typography.bodySmall,
@@ -604,13 +580,11 @@ private fun AddWaterDialog(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Input section with +/- buttons (following HTML design)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Minus button
                     Surface(
                         modifier = Modifier.size(48.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -635,7 +609,6 @@ private fun AddWaterDialog(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Input field with unit suffix (following HTML design exactly)
                     Row(
                         verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.Center
@@ -643,7 +616,6 @@ private fun AddWaterDialog(
                         BasicTextField(
                             value = state.customWaterAmount,
                             onValueChange = { newValue ->
-                                // Limit to 3000ml (or equivalent in oz) maximum (scientific safety limit)
                                 val amount = newValue.toIntOrNull()
                                 if (amount == null || amount <= 3000) {
                                     onCustomAmountChanged(newValue)
@@ -688,7 +660,6 @@ private fun AddWaterDialog(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Plus button
                     Surface(
                         modifier = Modifier.size(48.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -713,7 +684,6 @@ private fun AddWaterDialog(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Action buttons (following HTML design)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -757,10 +727,6 @@ private fun AddWaterDialog(
         }
     }
 }
-
-// ============================================================================
-// Utility Functions
-// ============================================================================
 
 private fun formatAmount(amount: Int): String {
     return if (amount >= 1000) {

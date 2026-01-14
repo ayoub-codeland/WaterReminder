@@ -26,33 +26,13 @@ fun AppScaffold(
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
-        // Top bar (already inside insets padding)
         topBar()
 
-        // Main content
         Box(modifier = Modifier.weight(1f)) {
             content(PaddingValues())
         }
 
-        // Bottom bar (already inside insets padding)
         bottomBar()
     }
 }
 
-/**
- * Simple screen container with system insets
- * Use when you don't need separate top/bottom bars
- */
-@Composable
-fun ScreenContainer(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)
-    ) {
-        content()
-    }
-}
