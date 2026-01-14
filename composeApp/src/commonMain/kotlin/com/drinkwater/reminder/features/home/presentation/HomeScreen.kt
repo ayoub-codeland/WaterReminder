@@ -62,10 +62,7 @@ fun HomeScreen(
     // Add Water Dialog
     if (state.showAddWaterDialog) {
         AddWaterDialog(
-            currentIntake = state.currentIntake,
-            dailyGoal = state.dailyGoal,
-            customAmount = state.customWaterAmount,
-            customAmountError = state.customAmountError,
+            state = state,
             onCustomAmountChanged = { viewModel.onEvent(HomeEvent.OnCustomAmountChanged(it)) },
             onAddPreset = { amount -> viewModel.onEvent(HomeEvent.OnAddWater(amount)) },
             onConfirmCustom = { viewModel.onEvent(HomeEvent.OnConfirmCustomAmount) },
@@ -145,9 +142,7 @@ private fun HomeContent(
             
             // Water Cup Component - CENTER PIECE
             WaterCupSection(
-                currentIntake = state.currentIntake,
-                dailyGoal = state.dailyGoal,
-                progressPercent = state.progressPercent,
+                state = state,
                 onReset = { onEvent(HomeEvent.OnResetIntake) }
             )
             
@@ -171,6 +166,7 @@ private fun HomeContent(
             
             // Quick Add Section
             QuickAddSection(
+                state = state,
                 onAddGlass = { onEvent(HomeEvent.OnAddGlass) },
                 onAddBottle = { onEvent(HomeEvent.OnAddBottle) },
                 onCustomClick = { onEvent(HomeEvent.OnAddWaterClick) }
@@ -209,12 +205,14 @@ private fun StreakBadge(streakDays: Int) {
 
 @Composable
 private fun WaterCupSection(
-    currentIntake: Int,
-    dailyGoal: Int,
-    progressPercent: Int,
+    state: HomeState,
     onReset: () -> Unit
 ) {
     var showResetDialog by remember { mutableStateOf(false) }
+
+    // Convert values for display
+    val displayCurrentIntake = state.toDisplayValue(state.currentIntake)
+    val displayDailyGoal = state.toDisplayValue(state.dailyGoal)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -222,8 +220,9 @@ private fun WaterCupSection(
     ) {
         // Water Cup - Clean display without any container/background
         WaterCupComponent(
-            currentAmount = currentIntake,
-            goalAmount = dailyGoal,
+            currentAmount = displayCurrentIntake,
+            goalAmount = displayDailyGoal,
+            unit = state.unitLabel,
             cupWidth = 220.dp,
             cupHeight = 280.dp,
             showTestPopup = false
@@ -241,7 +240,7 @@ private fun WaterCupSection(
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             ) {
                 Text(
-                    text = "$progressPercent% Complete",
+                    text = "${state.progressPercent}% Complete",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -249,7 +248,7 @@ private fun WaterCupSection(
             }
 
             // Reset button - subtle and elegant, follows app theme
-            if (currentIntake > 0) {
+            if (state.currentIntake > 0) {
                 Surface(
                     onClick = { showResetDialog = true },
                     shape = CircleShape,
@@ -275,7 +274,7 @@ private fun WaterCupSection(
 
         // Goal text
         Text(
-            text = "Goal: ${formatAmount(dailyGoal)} ml",
+            text = "Goal: ${formatAmount(displayDailyGoal)} ${state.unitLabel}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -342,12 +341,12 @@ private fun DailyTipCard(
     ) {
         Box {
             // Background image with opacity filter (matches HTML: opacity-10)
+            // Using matchParentSize to fill entire card regardless of content height
             androidx.compose.foundation.Image(
                 painter = painterResource(Res.drawable.tip_bg),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
+                    .matchParentSize()
                     .alpha(0.10f),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
             )
@@ -355,8 +354,7 @@ private fun DailyTipCard(
             // Gradient overlay (matches HTML: bg-gradient-to-r from-blue-50/50 to-transparent)
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
+                    .matchParentSize()
                     .background(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
@@ -418,10 +416,15 @@ private fun DailyTipCard(
 
 @Composable
 private fun QuickAddSection(
+    state: HomeState,
     onAddGlass: () -> Unit,
     onAddBottle: () -> Unit,
     onCustomClick: () -> Unit
 ) {
+    // Convert preset values for display
+    val glassAmount = state.toDisplayValue(250)
+    val bottleAmount = state.toDisplayValue(500)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -440,9 +443,9 @@ private fun QuickAddSection(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         // Quick add buttons grid
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -450,15 +453,15 @@ private fun QuickAddSection(
         ) {
             QuickAddButton(
                 label = "Glass",
-                amount = "250 ml",
+                amount = "$glassAmount ${state.unitLabel}",
                 icon = Icons.Outlined.WaterDrop,
                 onClick = onAddGlass,
                 modifier = Modifier.weight(1f)
             )
-            
+
             QuickAddButton(
                 label = "Bottle",
-                amount = "500 ml",
+                amount = "$bottleAmount ${state.unitLabel}",
                 icon = Icons.Outlined.CheckCircle,
                 onClick = onAddBottle,
                 modifier = Modifier.weight(1f)
@@ -561,10 +564,7 @@ private fun QuickAddButton(
 
 @Composable
 private fun AddWaterDialog(
-    currentIntake: Int,
-    dailyGoal: Int,
-    customAmount: String,
-    customAmountError: String?,
+    state: HomeState,
     onCustomAmountChanged: (String) -> Unit,
     onAddPreset: (Int) -> Unit,
     onConfirmCustom: () -> Unit,
@@ -596,7 +596,7 @@ private fun AddWaterDialog(
 
                 // Subtitle
                 Text(
-                    text = "Enter amount in milliliters",
+                    text = "Enter amount in ${state.unitLabel}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -619,7 +619,7 @@ private fun AddWaterDialog(
                     ) {
                         IconButton(
                             onClick = {
-                                val current = customAmount.toIntOrNull() ?: 0
+                                val current = state.customWaterAmount.toIntOrNull() ?: 0
                                 if (current > 0) {
                                     onCustomAmountChanged((current - 50).coerceAtLeast(0).toString())
                                 }
@@ -635,15 +635,15 @@ private fun AddWaterDialog(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Input field with ml suffix (following HTML design exactly)
+                    // Input field with unit suffix (following HTML design exactly)
                     Row(
                         verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         BasicTextField(
-                            value = customAmount,
+                            value = state.customWaterAmount,
                             onValueChange = { newValue ->
-                                // Limit to 3000ml maximum (scientific safety limit)
+                                // Limit to 3000ml (or equivalent in oz) maximum (scientific safety limit)
                                 val amount = newValue.toIntOrNull()
                                 if (amount == null || amount <= 3000) {
                                     onCustomAmountChanged(newValue)
@@ -661,7 +661,7 @@ private fun AddWaterDialog(
                                 Box(
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    if (customAmount.isEmpty()) {
+                                    if (state.customWaterAmount.isEmpty()) {
                                         Text(
                                             text = "300",
                                             style = MaterialTheme.typography.displaySmall.copy(
@@ -679,7 +679,7 @@ private fun AddWaterDialog(
                         Spacer(modifier = Modifier.width(4.dp))
 
                         Text(
-                            text = "ml",
+                            text = state.unitLabel,
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                             modifier = Modifier.padding(bottom = 4.dp)
@@ -697,7 +697,7 @@ private fun AddWaterDialog(
                     ) {
                         IconButton(
                             onClick = {
-                                val current = customAmount.toIntOrNull() ?: 0
+                                val current = state.customWaterAmount.toIntOrNull() ?: 0
                                 val newAmount = (current + 50).coerceAtMost(3000)
                                 onCustomAmountChanged(newAmount.toString())
                             }
@@ -736,7 +736,7 @@ private fun AddWaterDialog(
 
                     Button(
                         onClick = onConfirmCustom,
-                        enabled = customAmount.isNotBlank() && (customAmount.toIntOrNull() ?: 0) > 0,
+                        enabled = state.customWaterAmount.isNotBlank() && (state.customWaterAmount.toIntOrNull() ?: 0) > 0,
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp),

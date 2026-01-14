@@ -33,6 +33,7 @@ class HomeViewModel(
     
     init {
         loadUserData()
+        loadVolumeUnit()
         observeTodayIntake()
         updateDateAndGreeting()
         loadStreak()
@@ -64,10 +65,10 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 updateState { copy(isLoading = true) }
-                
+
                 val profile = userProfileRepository.getProfile()
                 val dailyGoal = userProfileRepository.getDailyGoal() ?: 2500
-                
+
                 updateState {
                     copy(
                         userName = profile?.username ?: "User",
@@ -78,6 +79,18 @@ class HomeViewModel(
             } catch (e: Exception) {
                 updateState { copy(isLoading = false) }
                 sendEffect(HomeSideEffect.ShowError("Failed to load user data"))
+            }
+        }
+    }
+
+    private fun loadVolumeUnit() {
+        viewModelScope.launch {
+            try {
+                val volumeUnit = userProfileRepository.getVolumeUnit()
+                updateState { copy(volumeUnit = volumeUnit) }
+            } catch (e: Exception) {
+                // Use default ML if load fails
+                e.printStackTrace()
             }
         }
     }

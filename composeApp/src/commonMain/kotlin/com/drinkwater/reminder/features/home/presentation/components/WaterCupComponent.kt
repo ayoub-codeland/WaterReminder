@@ -33,6 +33,7 @@ import kotlin.math.sin
 fun WaterCupComponent(
     currentAmount: Int,
     goalAmount: Int,
+    unit: String = "ml",
     modifier: Modifier = Modifier,
     cupWidth: Dp = 220.dp,
     cupHeight: Dp = 280.dp,
@@ -179,7 +180,7 @@ fun WaterCupComponent(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "ml",
+                    text = unit,
                     color = Color(0xFF0E7490),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
@@ -191,7 +192,7 @@ fun WaterCupComponent(
 
     if (showPopup && onAmountChanged != null) {
         WaterAdditionPopup(
-            currentAmount, goalAmount,
+            currentAmount, goalAmount, unit,
             onDismiss = { showPopup = false },
             onAddWater = { onAmountChanged(it); showPopup = false }
         )
@@ -597,6 +598,7 @@ private fun formatAmount(amount: Int): String {
 fun WaterAdditionPopup(
     currentAmount: Int,
     goalAmount: Int,
+    unit: String,
     onDismiss: () -> Unit,
     onAddWater: (Int) -> Unit
 ) {
@@ -618,7 +620,7 @@ fun WaterAdditionPopup(
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "${formatAmount(currentAmount)} / ${formatAmount(goalAmount)} ml",
+                    "${formatAmount(currentAmount)} / ${formatAmount(goalAmount)} $unit",
                     fontSize = 14.sp,
                     color = Color(0xFF888888)
                 )
@@ -645,7 +647,7 @@ fun WaterAdditionPopup(
                             input = v; selected = null
                         }
                     },
-                    label = { Text("Custom amount (ml)") },
+                    label = { Text("Custom amount ($unit)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
