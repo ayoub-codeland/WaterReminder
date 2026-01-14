@@ -114,13 +114,52 @@ class DataStoreNotificationRepository(
      * @return true if within active hours
      */
     private fun isWithinActiveHours(preference: NotificationPreference): Boolean {
-        // TODO: Implement time range check
-        // Parse wakeUpTime and bedtime (format: "HH:mm")
-        // Compare with current time
-        // Handle edge cases (e.g., bedtime after midnight)
+        try {
+            val currentTime = getCurrentTime()
+            val wakeTime = parseTime(preference.wakeUpTime)
+            val sleepTime = parseTime(preference.bedtime)
 
-        // For MVP, always return true
-        // This will be implemented in the Worker when checking if notification should be shown
-        return true
+            // Handle case where bedtime is after midnight (e.g., 02:00)
+            return if (sleepTime < wakeTime) {
+                // Bedtime is next day (e.g., wake at 07:00, sleep at 02:00)
+                currentTime >= wakeTime || currentTime < sleepTime
+            } else {
+                // Normal case (e.g., wake at 07:00, sleep at 22:30)
+                currentTime in wakeTime..sleepTime
+            }
+        } catch (e: Exception) {
+            // If parsing fails, allow notifications
+            return true
+        }
+    }
+
+    /**
+     * Get current time in minutes since midnight.
+     * @return Minutes since midnight (0-1439)
+     */
+    private fun getCurrentTime(): Int {
+        // Get current epoch milliseconds
+        val currentMillis = System.currentTimeMillis()
+
+        // Convert to hours and minutes
+        val totalMinutes = (currentMillis / 60000) % 1440 // Minutes in a day
+
+        // Get timezone offset
+        val timezoneOffset = java.util.TimeZone.getDefault().getOffset(currentMillis) / 60000
+
+        // Add timezone offset and wrap around 24 hours
+        return ((totalMinutes + timezoneOffset) % 1440).toInt()
+    }
+
+    /**
+     * Parse time string to minutes since midnight.
+     * @param time Time string in format "HH:mm"
+     * @return Minutes since midnight
+     */
+    private fun parseTime(time: String): Int {
+        val parts = time.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1].toInt()
+        return hour * 60 + minute
     }
 }
