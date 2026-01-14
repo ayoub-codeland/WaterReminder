@@ -3,8 +3,8 @@ package com.drinkwater.reminder.features.settings.presentation.profile
 import androidx.lifecycle.viewModelScope
 import com.drinkwater.reminder.core.domain.model.UserProfile
 import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
+import com.drinkwater.reminder.core.domain.usecase.SaveUserProfileUseCase
 import com.drinkwater.reminder.core.presentation.BaseViewModel
-import com.drinkwater.reminder.features.settings.domain.usecase.SaveUserProfileUseCase
 import kotlinx.coroutines.launch
 
 class EditProfileViewModel(

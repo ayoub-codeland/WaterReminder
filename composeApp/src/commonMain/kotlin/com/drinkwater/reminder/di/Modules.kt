@@ -15,6 +15,7 @@ import com.drinkwater.reminder.core.domain.repository.WaterIntakeRepository
 import com.drinkwater.reminder.core.domain.usecase.CalculateDailyGoalUseCase
 import com.drinkwater.reminder.core.domain.usecase.GetDailyTipUseCase
 import com.drinkwater.reminder.core.domain.usecase.GetUserProfileUseCase
+import com.drinkwater.reminder.core.domain.usecase.SaveUserProfileUseCase
 import com.drinkwater.reminder.core.domain.usecase.notification.GetNotificationPreferencesUseCase
 import com.drinkwater.reminder.core.domain.usecase.notification.ObserveNotificationPreferencesUseCase
 import com.drinkwater.reminder.core.domain.usecase.notification.SaveNotificationPreferencesUseCase
@@ -27,7 +28,6 @@ import com.drinkwater.reminder.features.main.AppViewModel
 import com.drinkwater.reminder.features.progress.domain.usecase.GetAllTimeStatsUseCase
 import com.drinkwater.reminder.features.progress.domain.usecase.GetWeeklyStatsUseCase
 import com.drinkwater.reminder.features.progress.presentation.ProgressViewModel
-import com.drinkwater.reminder.features.settings.domain.usecase.SaveUserProfileUseCase
 import com.drinkwater.reminder.features.settings.domain.usecase.UpdateActivityLevelUseCase
 import com.drinkwater.reminder.features.settings.domain.usecase.UpdateWeightUseCase
 import com.drinkwater.reminder.features.settings.presentation.activity.UpdateActivityLevelViewModel
