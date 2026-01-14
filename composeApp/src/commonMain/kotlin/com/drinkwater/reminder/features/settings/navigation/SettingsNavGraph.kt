@@ -23,6 +23,7 @@ import com.drinkwater.reminder.features.settings.presentation.weight.UpdateWeigh
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesScreen
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesSideEffect
 import com.drinkwater.reminder.features.settings.presentation.notifications.NotificationPreferencesViewModel
+import com.drinkwater.reminder.features.settings.presentation.notifications.UpdateNotificationScheduleScreen
 import com.drinkwater.reminder.features.settings.presentation.share.ShareScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,6 +45,7 @@ fun NavGraphBuilder.settingsGraph(
         updateActivityScreen(navController)
         updateGoalScreen(navController)
         notificationPreferencesScreen(navController)
+        updateNotificationScheduleScreen(navController)
         shareScreen(navController)
     }
 }
@@ -181,6 +183,9 @@ private fun NavGraphBuilder.notificationPreferencesScreen(
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 NotificationPreferencesSideEffect.NavigateBack -> navigator.navigateBack()
+                NotificationPreferencesSideEffect.NavigateToUpdateNotificationSchedule -> {
+                    navigator.navigateToUpdateNotificationSchedule()
+                }
                 is NotificationPreferencesSideEffect.ShowError -> {
                     // Error messaging handled by UI layer
                 }
@@ -192,6 +197,16 @@ private fun NavGraphBuilder.notificationPreferencesScreen(
                 }
             }
         }
+    }
+}
+
+private fun NavGraphBuilder.updateNotificationScheduleScreen(
+    navController: NavHostController
+) {
+    composable(SettingsDestination.UpdateNotificationSchedule.route) {
+        val viewModel = koinViewModel<NotificationPreferencesViewModel>()
+
+        UpdateNotificationScheduleScreen(viewModel = viewModel)
     }
 }
 

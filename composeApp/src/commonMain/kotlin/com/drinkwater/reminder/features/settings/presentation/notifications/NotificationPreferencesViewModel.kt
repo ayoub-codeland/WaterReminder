@@ -44,11 +44,12 @@ class NotificationPreferencesViewModel(
             }
 
             is NotificationPreferencesEvent.OnFrequencyClick -> {
-                sendEffect(
-                    NotificationPreferencesSideEffect.ShowFrequencyPicker(
-                        currentState.frequencyMinutes
-                    )
-                )
+                sendEffect(NotificationPreferencesSideEffect.NavigateToUpdateNotificationSchedule)
+            }
+
+            is NotificationPreferencesEvent.OnFrequencySelected -> {
+                updateState { copy(frequencyMinutes = event.frequencyMinutes) }
+                savePreferences()
             }
 
             is NotificationPreferencesEvent.OnWakeUpTimeClick -> {

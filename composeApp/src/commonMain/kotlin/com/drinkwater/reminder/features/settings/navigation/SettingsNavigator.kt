@@ -65,6 +65,12 @@ class SettingsNavigator(
         }
     }
 
+    fun navigateToUpdateNotificationSchedule() {
+        navController.navigate(SettingsDestination.UpdateNotificationSchedule.route) {
+            launchSingleTop = true
+        }
+    }
+
     fun navigateBack() {
         // Safely handle back navigation - prevent blank screens
         if (!navController.popBackStack()) {

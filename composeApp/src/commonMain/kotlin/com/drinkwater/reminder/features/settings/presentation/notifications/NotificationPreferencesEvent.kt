@@ -9,6 +9,7 @@ sealed interface NotificationPreferencesEvent : UiEvent {
     data object OnBackClick : NotificationPreferencesEvent
     data class OnToggleNotifications(val enabled: Boolean) : NotificationPreferencesEvent
     data object OnFrequencyClick : NotificationPreferencesEvent
+    data class OnFrequencySelected(val frequencyMinutes: Int) : NotificationPreferencesEvent
     data object OnWakeUpTimeClick : NotificationPreferencesEvent
     data class OnWakeUpTimeSelected(val time: String) : NotificationPreferencesEvent
     data object OnBedtimeClick : NotificationPreferencesEvent

@@ -30,4 +30,8 @@ sealed interface SettingsDestination : NavigationDestination {
     data object Share : SettingsDestination {
         override val route = "settings/share"
     }
+
+    data object UpdateNotificationSchedule : SettingsDestination {
+        override val route = "settings/update_notification_schedule"
+    }
 }
