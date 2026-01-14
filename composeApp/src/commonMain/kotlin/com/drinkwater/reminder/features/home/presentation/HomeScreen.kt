@@ -338,16 +338,16 @@ private fun DailyTipCard(
             .fillMaxWidth()
             .shadowSm(shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFFF1F5F9))
+        color = MaterialTheme.colorScheme.surface
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box {
             // Background image with opacity filter (matches HTML: opacity-10)
             androidx.compose.foundation.Image(
                 painter = painterResource(Res.drawable.tip_bg),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .height(80.dp)
                     .alpha(0.10f),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
             )
@@ -355,7 +355,8 @@ private fun DailyTipCard(
             // Gradient overlay (matches HTML: bg-gradient-to-r from-blue-50/50 to-transparent)
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .height(80.dp)
                     .background(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
@@ -366,19 +367,16 @@ private fun DailyTipCard(
                     )
             )
 
-            // Content
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    // Header with icon and label
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Lightbulb,
@@ -387,29 +385,21 @@ private fun DailyTipCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = "DAILY TIP",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp
-                            ),
+                            text = "Daily Tip",
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    // Tip text (matches HTML: text-slate-900 text-base font-medium)
                     Text(
                         text = tip,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium,
-                            lineHeight = 20.sp
-                        ),
-                        color = Color(0xFF0F172A)
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                // Close button (matches HTML: text-slate-400 hover:text-slate-600)
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier.size(32.dp)
@@ -417,7 +407,7 @@ private fun DailyTipCard(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Dismiss",
-                        tint = Color(0xFF94A3B8),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.size(20.dp)
                     )
                 }
