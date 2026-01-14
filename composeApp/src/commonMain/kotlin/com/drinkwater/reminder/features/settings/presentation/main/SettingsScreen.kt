@@ -1,6 +1,7 @@
 package com.drinkwater.reminder.features.settings.presentation.main
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,7 +27,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.outlined.LocalDrink
 import androidx.compose.material.icons.outlined.MonitorWeight
 import androidx.compose.material.icons.outlined.NotificationsActive
@@ -44,7 +44,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -52,6 +51,9 @@ import com.drinkwater.reminder.core.domain.model.ActivityLevel
 import com.drinkwater.reminder.core.domain.model.VolumeUnit
 import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
+import org.jetbrains.compose.resources.painterResource
+import waterreminderapp.composeapp.generated.resources.Res
+import waterreminderapp.composeapp.generated.resources.water_reminder_icon
 
 /**
  * Settings Screen
@@ -132,12 +134,12 @@ fun SettingsScreen(
                 }
             )
 
-            AppPreferencesSection(
+            /*AppPreferencesSection(
                 volumeUnit = state.volumeUnit,
                 onVolumeUnitChanged = { unit ->
                     viewModel.onEvent(SettingsEvent.OnVolumeUnitChanged(unit))
                 }
-            )
+            )*/
 
             SupportShareSection(
                 onShareClick = {
@@ -239,7 +241,7 @@ private fun SettingsItem(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(8.dp))
                     .background(iconBackgroundColor),
                 contentAlignment = Alignment.Center
             ) {
@@ -711,26 +713,17 @@ private fun AboutSection(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.primary.copy(blue = 0.8f)
-                            )
-                        )
-                    ),
+                    .clip(RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.WaterDrop,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary
+                Image(
+                    painter = painterResource(Res.drawable.water_reminder_icon),
+                    contentDescription = "Water Reminder"
                 )
             }
 
             Text(
-                text = "HydroTracker v$appVersion",
+                text = "HydroTracker $appVersion",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
