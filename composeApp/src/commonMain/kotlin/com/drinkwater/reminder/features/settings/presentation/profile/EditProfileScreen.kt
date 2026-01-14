@@ -20,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.drinkwater.reminder.core.domain.model.AgeGroup
 import com.drinkwater.reminder.core.domain.model.BiologicalSex
+import com.drinkwater.reminder.core.ui.components.AgeGroupCard
 import com.drinkwater.reminder.core.ui.components.AppScaffold
+import com.drinkwater.reminder.core.ui.components.BiologicalSexCard
 import com.drinkwater.reminder.core.ui.extensions.shadowSm
 
 @Composable
@@ -318,141 +320,6 @@ private fun EditProfileScreenContent(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun BiologicalSexCard(
-    sex: BiologicalSex,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val (icon, label, iconColor) = when (sex) {
-        BiologicalSex.MALE -> Triple(
-            Icons.Default.Male,
-            "Male",
-            MaterialTheme.colorScheme.primary
-        )
-
-        BiologicalSex.FEMALE -> Triple(
-            Icons.Default.Female,
-            "Female",
-            Color(0xFFEC4899)
-        )
-    }
-
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(120.dp).shadowSm(RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        border = if (isSelected)
-            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-        else
-            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(40.dp),
-                    shape = CircleShape,
-                    color = if (isSelected) iconColor else iconColor.copy(alpha = 0.2f),
-                    shadowElevation = if (isSelected) 2.dp else 0.dp
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = label,
-                            tint = if (isSelected)
-                                MaterialTheme.colorScheme.surface
-                            else
-                                iconColor,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    color = if (isSelected)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            if (isSelected) {
-                Surface(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(20.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Selected",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AgeGroupCard(
-    ageGroup: AgeGroup,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(48.dp).shadowSm(RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        border = if (isSelected)
-            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-        else
-            BorderStroke(
-                1.dp,
-                MaterialTheme.colorScheme.outlineVariant
-            ),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = ageGroup.toDisplayLabel(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                color = if (isSelected)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

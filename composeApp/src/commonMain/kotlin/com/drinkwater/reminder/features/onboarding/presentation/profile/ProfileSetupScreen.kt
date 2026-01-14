@@ -38,12 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
 import com.drinkwater.reminder.core.domain.model.AgeGroup
+import com.drinkwater.reminder.core.domain.model.BiologicalSex
 import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.ui.components.ActivitySlider
-import com.drinkwater.reminder.core.ui.components.AgeGroupButton
+import com.drinkwater.reminder.core.ui.components.AgeGroupCard
 import com.drinkwater.reminder.core.ui.components.AppScaffold
-import com.drinkwater.reminder.core.ui.components.BiologicalSex
-import com.drinkwater.reminder.core.ui.components.SexOptionCard
+import com.drinkwater.reminder.core.ui.components.BiologicalSexCard
 import com.drinkwater.reminder.core.ui.components.WeightInputField
 import kotlinx.coroutines.flow.collectLatest
 
@@ -203,19 +203,17 @@ fun ProfileSetupScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SexOptionCard(
-                    label = "Male",
-                    icon = Icons.Default.Male,
-                    selected = state.biologicalSex == BiologicalSex.MALE,
+                BiologicalSexCard(
+                    sex = BiologicalSex.MALE,
+                    isSelected = state.biologicalSex == BiologicalSex.MALE,
                     onClick = {
                         viewModel.onEvent(ProfileSetupUiEvent.OnBiologicalSexSelected(BiologicalSex.MALE))
                     },
                     modifier = Modifier.weight(1f)
                 )
-                SexOptionCard(
-                    label = "Female",
-                    icon = Icons.Default.Female,
-                    selected = state.biologicalSex == BiologicalSex.FEMALE,
+                BiologicalSexCard(
+                    sex = BiologicalSex.FEMALE,
+                    isSelected = state.biologicalSex == BiologicalSex.FEMALE,
                     onClick = {
                         viewModel.onEvent(ProfileSetupUiEvent.OnBiologicalSexSelected(BiologicalSex.FEMALE))
                     },
@@ -239,17 +237,17 @@ fun ProfileSetupScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AgeGroupButton(
-                        label = "18-30",
-                        selected = state.ageGroup == AgeGroup.AGE_18_30,
+                    AgeGroupCard(
+                        ageGroup = AgeGroup.AGE_18_30,
+                        isSelected = state.ageGroup == AgeGroup.AGE_18_30,
                         onClick = {
                             viewModel.onEvent(ProfileSetupUiEvent.OnAgeGroupSelected(AgeGroup.AGE_18_30))
                         },
                         modifier = Modifier.weight(1f)
                     )
-                    AgeGroupButton(
-                        label = "31-50",
-                        selected = state.ageGroup == AgeGroup.AGE_31_50,
+                    AgeGroupCard(
+                        ageGroup = AgeGroup.AGE_31_50,
+                        isSelected = state.ageGroup == AgeGroup.AGE_31_50,
                         onClick = {
                             viewModel.onEvent(ProfileSetupUiEvent.OnAgeGroupSelected(AgeGroup.AGE_31_50))
                         },
@@ -259,17 +257,17 @@ fun ProfileSetupScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AgeGroupButton(
-                        label = "51-60",
-                        selected = state.ageGroup == AgeGroup.AGE_51_60,
+                    AgeGroupCard(
+                        ageGroup = AgeGroup.AGE_51_60,
+                        isSelected = state.ageGroup == AgeGroup.AGE_51_60,
                         onClick = {
                             viewModel.onEvent(ProfileSetupUiEvent.OnAgeGroupSelected(AgeGroup.AGE_51_60))
                         },
                         modifier = Modifier.weight(1f)
                     )
-                    AgeGroupButton(
-                        label = "60+",
-                        selected = state.ageGroup == AgeGroup.AGE_60_PLUS,
+                    AgeGroupCard(
+                        ageGroup = AgeGroup.AGE_60_PLUS,
+                        isSelected = state.ageGroup == AgeGroup.AGE_60_PLUS,
                         onClick = {
                             viewModel.onEvent(ProfileSetupUiEvent.OnAgeGroupSelected(AgeGroup.AGE_60_PLUS))
                         },

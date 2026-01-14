@@ -51,17 +51,9 @@ class ProfileSetupViewModel(
         viewModelScope.launch {
             delay(300)
 
-            // Map UI BiologicalSex to Domain BiologicalSex
-            val domainBiologicalSex = when (currentState.biologicalSex) {
-                com.drinkwater.reminder.core.ui.components.BiologicalSex.MALE ->
-                    com.drinkwater.reminder.core.domain.model.BiologicalSex.MALE
-                com.drinkwater.reminder.core.ui.components.BiologicalSex.FEMALE ->
-                    com.drinkwater.reminder.core.domain.model.BiologicalSex.FEMALE
-            }
-
             // Create user profile for calculation
             val profile = UserProfile(
-                biologicalSex = domainBiologicalSex,
+                biologicalSex = currentState.biologicalSex,
                 ageGroup = currentState.ageGroup,
                 weight = weight,
                 weightUnit = currentState.weightUnit,

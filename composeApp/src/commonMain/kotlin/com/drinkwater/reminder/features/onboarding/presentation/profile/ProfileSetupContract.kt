@@ -2,11 +2,11 @@ package com.drinkwater.reminder.features.onboarding.presentation.profile
 
 import com.drinkwater.reminder.core.domain.model.ActivityLevel
 import com.drinkwater.reminder.core.domain.model.AgeGroup
+import com.drinkwater.reminder.core.domain.model.BiologicalSex
 import com.drinkwater.reminder.core.domain.model.WeightUnit
 import com.drinkwater.reminder.core.presentation.UiEffect
 import com.drinkwater.reminder.core.presentation.UiEvent
 import com.drinkwater.reminder.core.presentation.UiState
-import com.drinkwater.reminder.core.ui.components.BiologicalSex
 
 
 /**
