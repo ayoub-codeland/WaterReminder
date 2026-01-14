@@ -51,29 +51,34 @@ class ProfileSetupViewModel(
         viewModelScope.launch {
             delay(300)
 
-            // Calculate daily goal using the use case
-            val dailyGoal = calculateDailyGoalUseCase(
-                weight = weight,
-                weightUnit = currentState.weightUnit,
-                activityLevel = currentState.activityLevel,
-                biologicalSex = currentState.biologicalSex,
-                ageGroup = currentState.ageGroup
-            )
+            // Map UI BiologicalSex to Domain BiologicalSex
+            val domainBiologicalSex = when (currentState.biologicalSex) {
+                com.drinkwater.reminder.core.ui.components.BiologicalSex.MALE ->
+                    com.drinkwater.reminder.core.domain.model.BiologicalSex.MALE
+                com.drinkwater.reminder.core.ui.components.BiologicalSex.FEMALE ->
+                    com.drinkwater.reminder.core.domain.model.BiologicalSex.FEMALE
+            }
 
-            // Create and save user profile
+            // Create user profile for calculation
             val profile = UserProfile(
-                biologicalSex = currentState.biologicalSex,
+                biologicalSex = domainBiologicalSex,
                 ageGroup = currentState.ageGroup,
                 weight = weight,
                 weightUnit = currentState.weightUnit,
                 activityLevel = currentState.activityLevel,
-                dailyGoal = dailyGoal,
+                dailyGoal = 0, // Will be calculated
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis()
             )
 
+            // Calculate daily goal using the use case
+            val dailyGoal = calculateDailyGoalUseCase(profile)
+
+            // Update profile with calculated goal
+            val profileWithGoal = profile.copy(dailyGoal = dailyGoal)
+
             // Save profile to repository
-            saveUserProfileUseCase(profile)
+            saveUserProfileUseCase(profileWithGoal)
 
             updateState { copy(isCalculating = false) }
             sendEffect(ProfileSetupUiEffect.NavigateToDashboard(dailyGoal))
