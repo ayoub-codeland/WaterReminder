@@ -1,5 +1,6 @@
 package com.drinkwater.reminder.features.settings.presentation.share
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drinkwater.reminder.core.ui.components.AppScaffold
+import org.jetbrains.compose.resources.painterResource
+import waterreminderapp.composeapp.generated.resources.Res
+import waterreminderapp.composeapp.generated.resources.share_image
 
 @Composable
 fun ShareScreen(
@@ -77,22 +81,22 @@ fun ShareScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Image placeholder with gradient overlay (aspect ratio 4:3)
+            // Share image with gradient overlay (aspect ratio 4:3)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4f / 3f)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-                            )
-                        )
-                    ),
+                    .clip(RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
+                // Background image
+                Image(
+                    painter = painterResource(Res.drawable.share_image),
+                    contentDescription = "Share HydroTracker",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+
                 // Gradient overlay from bottom
                 Box(
                     modifier = Modifier

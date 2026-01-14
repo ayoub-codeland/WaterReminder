@@ -1,6 +1,18 @@
 package com.drinkwater.reminder.features.settings.navigation
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+
+/**
+ * Platform-specific operations interface
+ */
+interface PlatformOperations {
+    fun shareApp()
+    fun rateApp()
+    fun copyLink()
+    fun openUrl(url: String)
+}
 
 /**
  * Navigator for Settings feature
@@ -9,7 +21,10 @@ import androidx.navigation.NavController
  * Note: Bottom navigation and tab switching is handled at app level.
  * This navigator is ONLY for settings sub-screens (Edit Profile, Update Weight, etc.)
  */
-class SettingsNavigator(private val navController: NavController) {
+class SettingsNavigator(
+    private val navController: NavController,
+    internal val platformOps: PlatformOperations
+) {
 
     fun navigateToHome() {
         // Called by BackHandler from SettingsScreen main screen
@@ -62,7 +77,7 @@ class SettingsNavigator(private val navController: NavController) {
     }
 
     fun openUrl(url: String) {
-        // Platform-specific implementation handled by activity
+        platformOps.openUrl(url)
     }
 
     fun navigateToShare() {
@@ -72,14 +87,21 @@ class SettingsNavigator(private val navController: NavController) {
     }
 
     fun shareApp() {
-        // Platform-specific share implementation
+        platformOps.shareApp()
     }
 
     fun rateApp() {
-        // Platform-specific app store rating
+        platformOps.rateApp()
     }
 
     fun copyLink() {
-        // Platform-specific clipboard implementation
+        platformOps.copyLink()
     }
 }
+
+/**
+ * Platform-specific factory function for creating SettingsNavigator
+ * Must be implemented separately for each platform (Android, iOS)
+ */
+@Composable
+expect fun rememberSettingsNavigator(navController: NavHostController): SettingsNavigator

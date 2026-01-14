@@ -65,11 +65,11 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.OnPrivacyPolicyClick -> {
-                sendEffect(SettingsEffect.OpenUrl("https://example.com/privacy"))
+                sendEffect(SettingsEffect.OpenUrl("https://yourwebsite.com/privacy-policy"))
             }
 
             is SettingsEvent.OnTermsOfServiceClick -> {
-                sendEffect(SettingsEffect.OpenUrl("https://example.com/terms"))
+                sendEffect(SettingsEffect.OpenUrl("https://yourwebsite.com/terms-of-service"))
             }
         }
     }

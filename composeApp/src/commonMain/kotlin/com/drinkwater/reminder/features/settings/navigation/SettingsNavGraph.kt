@@ -38,22 +38,22 @@ fun NavGraphBuilder.settingsGraph(
         startDestination = SettingsDestination.Main.route,
         route = route
     ) {
-        val navigator = SettingsNavigator(navController)
-        
-        settingsMainScreen(navigator)
-        editProfileScreen(navigator)
-        updateWeightScreen(navigator)
-        updateActivityScreen(navigator)
-        updateGoalScreen(navigator)
-        notificationPreferencesScreen(navigator)
-        shareScreen(navigator)
+        settingsMainScreen(navController)
+        editProfileScreen(navController)
+        updateWeightScreen(navController)
+        updateActivityScreen(navController)
+        updateGoalScreen(navController)
+        notificationPreferencesScreen(navController)
+        shareScreen(navController)
     }
 }
 
 private fun NavGraphBuilder.settingsMainScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.Main.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<SettingsViewModel>()
 
@@ -61,7 +61,7 @@ private fun NavGraphBuilder.settingsMainScreen(
             viewModel = viewModel,
             onNavigateToHome = navigator::navigateToHome
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 SettingsEffect.NavigateBack -> navigator.navigateBack()
@@ -79,16 +79,18 @@ private fun NavGraphBuilder.settingsMainScreen(
 }
 
 private fun NavGraphBuilder.editProfileScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.EditProfile.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<EditProfileViewModel>()
-        
+
         EditProfileScreen(
             viewModel = viewModel,
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 EditProfileEffect.NavigateBack -> navigator.navigateBack()
@@ -100,16 +102,18 @@ private fun NavGraphBuilder.editProfileScreen(
 }
 
 private fun NavGraphBuilder.updateWeightScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.UpdateWeight.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<UpdateWeightViewModel>()
-        
+
         UpdateWeightScreen(
             viewModel = viewModel,
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 UpdateWeightEffect.NavigateBack -> navigator.navigateBack()
@@ -120,16 +124,18 @@ private fun NavGraphBuilder.updateWeightScreen(
 }
 
 private fun NavGraphBuilder.updateActivityScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.UpdateActivity.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<UpdateActivityLevelViewModel>()
-        
+
         UpdateActivityLevelScreen(
             viewModel = viewModel,
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 UpdateActivityLevelEffect.NavigateBack -> navigator.navigateBack()
@@ -140,16 +146,18 @@ private fun NavGraphBuilder.updateActivityScreen(
 }
 
 private fun NavGraphBuilder.updateGoalScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.UpdateGoal.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<UpdateDailyGoalViewModel>()
-        
+
         UpdateDailyGoalScreen(
             viewModel = viewModel,
         )
-        
+
         HandleEffects(viewModel.effect) { effect ->
             when (effect) {
                 UpdateDailyGoalEffect.NavigateBack -> navigator.navigateBack()
@@ -160,9 +168,11 @@ private fun NavGraphBuilder.updateGoalScreen(
 }
 
 private fun NavGraphBuilder.notificationPreferencesScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.Notifications.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         // Inject ViewModel via Koin
         val viewModel = koinViewModel<NotificationPreferencesViewModel>()
 
@@ -186,9 +196,11 @@ private fun NavGraphBuilder.notificationPreferencesScreen(
 }
 
 private fun NavGraphBuilder.shareScreen(
-    navigator: SettingsNavigator
+    navController: NavHostController
 ) {
     composable(SettingsDestination.Share.route) {
+        val navigator = rememberSettingsNavigator(navController)
+
         ShareScreen(
             onBackClick = { navigator.navigateBack() },
             onShareClick = { navigator.shareApp() },
