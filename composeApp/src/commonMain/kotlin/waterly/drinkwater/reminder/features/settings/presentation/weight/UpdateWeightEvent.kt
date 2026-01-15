@@ -1,0 +1,13 @@
+package waterly.drinkwater.reminder.features.settings.presentation.weight
+
+import waterly.drinkwater.reminder.core.domain.model.WeightUnit
+import waterly.drinkwater.reminder.core.presentation.UiEvent
+
+sealed interface UpdateWeightEvent : UiEvent {
+    data class OnWeightChanged(val weight: Float) : UpdateWeightEvent
+    data class OnWeightUnitChanged(val unit: WeightUnit) : UpdateWeightEvent
+    data object OnIncrementWeight : UpdateWeightEvent
+    data object OnDecrementWeight : UpdateWeightEvent
+    data object OnSaveClick : UpdateWeightEvent
+    data object OnBackClick : UpdateWeightEvent
+}

@@ -67,11 +67,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.drinkwater.reminder"
+    namespace = "waterly.drinkwater.reminder"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.drinkwater.reminder"
+        applicationId = "waterly.drinkwater.reminder"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
